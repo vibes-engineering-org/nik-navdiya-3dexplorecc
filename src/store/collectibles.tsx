@@ -105,6 +105,7 @@ export function CollectiblesProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       console.log('Loading more collectibles...');
+      // Implementation would go here
     } catch (error) {
       console.error('Failed to load more collectibles:', error);
     } finally {

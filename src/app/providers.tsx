@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import posthog from "posthog-js";
 import { PostHogProvider as PHProvider } from "posthog-js/react";
 import { useMiniAppSdk } from "~/hooks/use-miniapp-sdk";
+import { CollectiblesProvider } from "~/store/collectibles";
 
 const WagmiProvider = dynamic(
   () => import("~/components/providers/WagmiProvider"),
@@ -61,7 +62,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <WagmiProvider>
-      <PostHogProvider>{children}</PostHogProvider>
+      <PostHogProvider>
+        <CollectiblesProvider>
+          {children}
+        </CollectiblesProvider>
+      </PostHogProvider>
     </WagmiProvider>
   );
 }
