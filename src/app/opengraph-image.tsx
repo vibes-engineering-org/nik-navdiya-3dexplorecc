@@ -26,7 +26,7 @@ export default async function Image() {
           overflow: "hidden",
         }}
       >
-        {/* Background gradient with Farcaster purple and electric blue */}
+        {/* 3D road gradient background */}
         <div
           style={{
             position: "absolute",
@@ -34,12 +34,12 @@ export default async function Image() {
             left: 0,
             right: 0,
             bottom: 0,
-            background: "linear-gradient(135deg, #8A63D2 0%, #1E90FF 100%)",
-            opacity: 0.9,
+            background: "linear-gradient(180deg, #2D1B69 0%, #8A63D2 30%, #1E90FF 60%, #00D4AA 100%)",
+            opacity: 0.95,
           }}
         />
 
-        {/* Subtle pattern overlay for depth */}
+        {/* Perspective road lines for 3D effect */}
         <div
           style={{
             position: "absolute",
@@ -47,8 +47,11 @@ export default async function Image() {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundImage:
-              "radial-gradient(circle at 20% 80%, rgba(138, 99, 210, 0.4) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(30, 144, 255, 0.4) 0%, transparent 50%)",
+            backgroundImage: `
+              linear-gradient(90deg, transparent 20%, rgba(255,255,255,0.1) 22%, rgba(255,255,255,0.1) 23%, transparent 25%),
+              linear-gradient(90deg, transparent 75%, rgba(255,255,255,0.1) 77%, rgba(255,255,255,0.1) 78%, transparent 80%),
+              linear-gradient(0deg, transparent 70%, rgba(255,255,255,0.05) 80%, transparent 90%)
+            `,
           }}
         />
 
@@ -66,48 +69,51 @@ export default async function Image() {
             zIndex: 10,
           }}
         >
-          {/* User avatar with glow effect */}
+          {/* 3D collectible cards floating effect */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              marginBottom: "48px",
+              marginBottom: "40px",
               position: "relative",
+              gap: "24px",
             }}
           >
-            {/* Glow effect */}
+            {/* Card 1 - rotated left */}
             <div
               style={{
-                position: "absolute",
-                width: "140px",
-                height: "140px",
-                borderRadius: "50%",
-                background:
-                  "radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%)",
-                filter: "blur(20px)",
+                width: "80px",
+                height: "80px",
+                backgroundColor: "rgba(255, 255, 255, 0.15)",
+                border: "3px solid rgba(255, 255, 255, 0.4)",
+                borderRadius: "16px",
+                transform: "rotateY(-25deg) rotateX(10deg)",
+                boxShadow: "0 12px 24px rgba(0, 0, 0, 0.3)",
+                backdropFilter: "blur(8px)",
               }}
             />
-            {/* Avatar container */}
+            {/* Main avatar with holographic effect */}
             <div
               style={{
                 width: "120px",
                 height: "120px",
-                borderRadius: "50%",
+                borderRadius: "20px",
                 overflow: "hidden",
-                border: "6px solid rgba(255, 255, 255, 0.95)",
+                border: "4px solid rgba(255, 255, 255, 0.6)",
                 backgroundColor: "#ffffff",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 position: "relative",
-                boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
+                boxShadow: "0 16px 40px rgba(0, 0, 0, 0.4), inset 0 2px 8px rgba(255, 255, 255, 0.2)",
+                transform: "translateZ(20px)",
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={PROJECT_AVATAR_URL}
-                alt="User avatar"
+                alt="Creator avatar"
                 style={{
                   width: "100%",
                   height: "100%",
@@ -115,24 +121,39 @@ export default async function Image() {
                 }}
               />
             </div>
+            {/* Card 2 - rotated right */}
+            <div
+              style={{
+                width: "80px",
+                height: "80px",
+                backgroundColor: "rgba(255, 255, 255, 0.15)",
+                border: "3px solid rgba(255, 255, 255, 0.4)",
+                borderRadius: "16px",
+                transform: "rotateY(25deg) rotateX(10deg)",
+                boxShadow: "0 12px 24px rgba(0, 0, 0, 0.3)",
+                backdropFilter: "blur(8px)",
+              }}
+            />
           </div>
 
-          {/* Project title with high contrast */}
+          {/* Project title with 3D text effect */}
           <h1
             style={{
-              fontSize: PROJECT_TITLE.length > 25 ? "65px" : "72px",
+              fontSize: "84px",
               fontWeight: "900",
               color: "#ffffff",
               textAlign: "center",
-              marginBottom: "40px",
-              lineHeight: 1.1,
-              letterSpacing: "-2px",
-              textShadow: "0 6px 20px rgba(0, 0, 0, 0.4)",
+              marginBottom: "32px",
+              lineHeight: 1.0,
+              letterSpacing: "-3px",
+              textShadow: "0 8px 32px rgba(0, 0, 0, 0.6), 0 4px 16px rgba(138, 99, 210, 0.8)",
               maxWidth: "1100px",
               fontFamily: "system-ui, -apple-system, sans-serif",
-              whiteSpace: PROJECT_TITLE.length > 40 ? "normal" : "nowrap",
-              paddingLeft: "20px",
-              paddingRight: "20px",
+              background: "linear-gradient(180deg, #ffffff 0%, #E0E7FF 100%)",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              transform: "perspective(800px) rotateX(15deg)",
             }}
           >
             {PROJECT_TITLE}
@@ -141,61 +162,103 @@ export default async function Image() {
           {/* Project description */}
           <p
             style={{
-              fontSize: "36px",
+              fontSize: "42px",
               fontWeight: "600",
-              color: "rgba(255, 255, 255, 0.95)",
+              color: "rgba(255, 255, 255, 0.92)",
               textAlign: "center",
-              marginBottom: "56px",
-              lineHeight: 1.3,
-              textShadow: "0 3px 12px rgba(0, 0, 0, 0.4)",
-              maxWidth: "800px",
+              marginBottom: "48px",
+              lineHeight: 1.2,
+              textShadow: "0 4px 16px rgba(0, 0, 0, 0.5)",
+              maxWidth: "900px",
               fontFamily: "system-ui, -apple-system, sans-serif",
             }}
           >
             {PROJECT_DESCRIPTION}
           </p>
 
-          {/* Farcaster branding element */}
+          {/* 3D Navigation hint */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "16px",
-              padding: "20px 40px",
-              backgroundColor: "rgba(255, 255, 255, 0.2)",
-              borderRadius: "100px",
-              border: "3px solid rgba(255, 255, 255, 0.4)",
-              backdropFilter: "blur(10px)",
-              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+              gap: "20px",
+              padding: "24px 48px",
+              backgroundColor: "rgba(255, 255, 255, 0.15)",
+              borderRadius: "60px",
+              border: "2px solid rgba(255, 255, 255, 0.3)",
+              backdropFilter: "blur(12px)",
+              boxShadow: "0 12px 40px rgba(0, 0, 0, 0.3), inset 0 2px 8px rgba(255, 255, 255, 0.1)",
+              transform: "perspective(400px) rotateX(5deg)",
             }}
           >
-            {/* Farcaster icon */}
-            <svg
-              width="32"
-              height="32"
-              viewBox="0 0 256 256"
-              fill="none"
+            {/* 3D cube icon */}
+            <div
               style={{
-                display: "block",
+                width: "36px",
+                height: "36px",
+                backgroundColor: "rgba(255, 255, 255, 0.9)",
+                border: "2px solid rgba(255, 255, 255, 0.6)",
+                borderRadius: "8px",
+                transform: "rotateY(25deg) rotateX(15deg)",
+                boxShadow: "0 6px 16px rgba(0, 0, 0, 0.4)",
               }}
-            >
-              <rect width="256" height="256" rx="56" fill="#7C65C1"></rect>
-              <path
-                d="M183.296 71.68H211.968L207.872 94.208H200.704V180.224L201.02 180.232C204.266 180.396 206.848 183.081 206.848 186.368V191.488L207.164 191.496C210.41 191.66 212.992 194.345 212.992 197.632V202.752H155.648V197.632C155.648 194.345 158.229 191.66 161.476 191.496L161.792 191.488V186.368C161.792 183.081 164.373 180.396 167.62 180.232L167.936 180.224V138.24C167.936 116.184 150.056 98.304 128 98.304C105.944 98.304 88.0638 116.184 88.0638 138.24V180.224L88.3798 180.232C91.6262 180.396 94.2078 183.081 94.2078 186.368V191.488L94.5238 191.496C97.7702 191.66 100.352 194.345 100.352 197.632V202.752H43.0078V197.632C43.0078 194.345 45.5894 191.66 48.8358 191.496L49.1518 191.488V186.368C49.1518 183.081 51.7334 180.396 54.9798 180.232L55.2958 180.224V94.208H48.1278L44.0318 71.68H72.7038V54.272H183.296V71.68Z"
-                fill="white"
-              ></path>
-            </svg>
+            />
             <span
               style={{
-                fontSize: "26px",
+                fontSize: "32px",
                 fontWeight: "700",
                 color: "#ffffff",
                 fontFamily: "system-ui, -apple-system, sans-serif",
-                letterSpacing: "-0.5px",
+                letterSpacing: "-0.8px",
+                textShadow: "0 2px 8px rgba(0, 0, 0, 0.4)",
               }}
             >
-              Farcaster Mini App
+              Navigate Forward & Backward
             </span>
+            {/* Arrow indicators */}
+            <div
+              style={{
+                display: "flex",
+                gap: "12px",
+              }}
+            >
+              <div
+                style={{
+                  width: "28px",
+                  height: "28px",
+                  backgroundColor: "rgba(255, 255, 255, 0.8)",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "16px",
+                  fontWeight: "900",
+                  color: "#2D1B69",
+                  transform: "rotateY(-15deg)",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+                }}
+              >
+                ←
+              </div>
+              <div
+                style={{
+                  width: "28px",
+                  height: "28px",
+                  backgroundColor: "rgba(255, 255, 255, 0.8)",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "16px",
+                  fontWeight: "900",
+                  color: "#2D1B69",
+                  transform: "rotateY(15deg)",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+                }}
+              >
+                →
+              </div>
+            </div>
           </div>
         </div>
 
