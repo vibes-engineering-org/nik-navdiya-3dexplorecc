@@ -136,39 +136,61 @@ export function Scene3D() {
         )}
       </div>
 
-      {/* Mobile Navigation Controls */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-4 md:hidden">
+      {/* Enhanced Mobile Navigation Controls */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-3 px-4 py-2 bg-black bg-opacity-60 backdrop-blur-sm rounded-2xl border border-white border-opacity-20">
         <button
           onClick={() => moveBike('backward')}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full shadow-lg transition-colors"
+          className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 disabled:from-gray-500 disabled:to-gray-600 text-white p-3 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50"
           disabled={currentCollectibleIndex <= 0}
         >
-          ← Back
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
         </button>
+        
+        {/* Position Progress Bar */}
+        <div className="flex flex-col items-center min-w-[120px]">
+          <div className="text-white text-xs font-medium mb-1">
+            {currentCollectibleIndex + 1} of {currentCollectibles.length}
+          </div>
+          <div className="w-20 h-1 bg-gray-700 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-purple-400 to-blue-400 transition-all duration-300"
+              style={{ width: `${((currentCollectibleIndex + 1) / currentCollectibles.length) * 100}%` }}
+            />
+          </div>
+        </div>
+
         <button
           onClick={() => moveBike('forward')}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full shadow-lg transition-colors"
+          className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 disabled:from-gray-500 disabled:to-gray-600 text-white p-3 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50"
           disabled={hasReachedEnd}
         >
-          Forward →
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
         </button>
       </div>
 
-      {/* Position indicator */}
-      <div className="absolute top-6 left-6 bg-black bg-opacity-50 text-white px-4 py-2 rounded-lg">
-        <p className="text-sm">
-          Position: {currentCollectibleIndex + 1} / {currentCollectibles.length}
-        </p>
-        <p className="text-xs opacity-75">
-          {selectedPath === 'recent' ? 'Recent Collectibles' : 'My Collection'}
-        </p>
+      {/* Compact Mobile Info Bar */}
+      <div className="absolute top-4 left-4 right-4 md:left-6 md:right-auto md:max-w-xs">
+        <div className="bg-black bg-opacity-60 backdrop-blur-sm text-white px-4 py-2 rounded-xl border border-white border-opacity-20">
+          <div className="flex justify-between items-center text-sm">
+            <span className="font-medium">
+              {selectedPath === 'recent' ? 'Recent' : 'My Collection'}
+            </span>
+            <span className="text-xs opacity-75 hidden md:block">
+              ↑↓ keys or tap to navigate
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Instructions */}
-      <div className="absolute top-6 right-6 bg-black bg-opacity-50 text-white px-4 py-2 rounded-lg max-w-xs">
-        <p className="text-xs">
-          Use ↑↓ keys or buttons to navigate. Click stones to view collectibles.
-        </p>
+      {/* Touch instruction for mobile */}
+      <div className="absolute top-1/2 left-4 transform -translate-y-1/2 md:hidden">
+        <div className="bg-black bg-opacity-40 backdrop-blur-sm text-white text-xs px-3 py-2 rounded-lg border border-white border-opacity-20">
+          Tap stones
+        </div>
       </div>
 
       {/* Hologram Display */}

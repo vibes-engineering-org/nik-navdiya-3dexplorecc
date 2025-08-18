@@ -32,44 +32,63 @@ export function HologramDisplay({ collectible, onClose }: HologramDisplayProps) 
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
-      {/* Hologram Container */}
+    <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-2 sm:p-4">
+      {/* Enhanced Hologram Container */}
       <div 
-        className="relative bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 rounded-2xl p-1 max-w-2xl w-full max-h-[90vh] overflow-hidden"
+        className="relative w-full max-w-4xl max-h-[95vh] overflow-hidden"
         style={{
-          boxShadow: '0 0 50px rgba(59, 130, 246, 0.5)',
-          animation: 'hologramGlow 2s ease-in-out infinite alternate'
+          animation: 'hologramGlow 2s ease-in-out infinite alternate, hologramFloat 4s ease-in-out infinite'
         }}
       >
-        {/* Holographic border effect */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 opacity-60 animate-pulse"></div>
+        {/* Multi-layer holographic effects */}
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-400 via-blue-500 via-purple-500 to-pink-500 p-[2px] animate-spin-slow">
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-pulse"></div>
+        </div>
         
-        {/* Main content */}
-        <div className="relative bg-gray-900 rounded-xl p-6 overflow-y-auto max-h-full">
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl font-bold z-10 w-8 h-8 flex items-center justify-center"
-          >
-            ×
-          </button>
+        {/* Outer glow ring */}
+        <div className="absolute -inset-4 rounded-3xl bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 opacity-30 blur-xl animate-pulse"></div>
+        
+        {/* Inner content container */}
+        <div className="relative bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 rounded-2xl border border-cyan-400 border-opacity-50 overflow-hidden backdrop-blur-sm">
+          {/* Holographic grid overlay */}
+          <div 
+            className="absolute inset-0 opacity-10 pointer-events-none"
+            style={{
+              backgroundImage: `
+                linear-gradient(rgba(0,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,255,0.1) 1px, transparent 1px)
+              `,
+              backgroundSize: '20px 20px'
+            }}
+          />
+          
+          {/* Main scrollable content */}
+          <div className="relative p-4 sm:p-6 overflow-y-auto max-h-[95vh] scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-cyan-500">
+            {/* Enhanced Close button */}
+            <button
+              onClick={onClose}
+              className="absolute top-2 right-2 sm:top-4 sm:right-4 text-cyan-400 hover:text-white text-2xl font-bold z-20 w-10 h-10 bg-gray-900 bg-opacity-80 rounded-full border border-cyan-400 border-opacity-50 flex items-center justify-center backdrop-blur-sm hover:bg-opacity-100 transition-all"
+            >
+              ×
+            </button>
 
-          {/* Author section */}
-          <div className="flex items-center space-x-4 mb-6 pb-4 border-b border-gray-700">
-            <div className="relative">
-              <img 
-                src={collectible.author.pfp.url} 
-                alt={collectible.author.display_name}
-                className="w-16 h-16 rounded-full border-2 border-blue-400"
-              />
-              <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 opacity-60 animate-spin"></div>
+            {/* Enhanced Author section */}
+            <div className="flex items-center space-x-3 sm:space-x-4 mb-6 pb-4 border-b border-cyan-500 border-opacity-30">
+              <div className="relative flex-shrink-0">
+                <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 opacity-60 animate-pulse"></div>
+                <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 opacity-80 animate-spin-slow"></div>
+                <img 
+                  src={collectible.author.pfp.url} 
+                  alt={collectible.author.display_name}
+                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-cyan-400 relative z-10"
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-lg sm:text-xl font-bold text-white truncate">{collectible.author.display_name}</h2>
+                <p className="text-cyan-400 text-sm sm:text-base truncate">@{collectible.author.username}</p>
+                <p className="text-xs text-gray-400">FID: {collectible.author.fid}</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-xl font-bold text-white">{collectible.author.display_name}</h2>
-              <p className="text-gray-400">@{collectible.author.username}</p>
-              <p className="text-sm text-gray-500">FID: {collectible.author.fid}</p>
-            </div>
-          </div>
 
           {/* Content */}
           <div className="mb-6">
@@ -155,29 +174,69 @@ export function HologramDisplay({ collectible, onClose }: HologramDisplayProps) 
             </div>
           </div>
 
-          {/* Action buttons */}
-          <div className="flex flex-wrap gap-3">
-            <button className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-2 rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all shadow-lg">
-              View on Farcaster
-            </button>
-            <button className="bg-gradient-to-r from-green-500 to-teal-500 text-white px-6 py-2 rounded-lg hover:from-green-600 hover:to-teal-600 transition-all shadow-lg">
-              Collect
-            </button>
-            <button className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-6 py-2 rounded-lg hover:from-pink-600 hover:to-rose-600 transition-all shadow-lg">
-              Share
-            </button>
+            {/* Enhanced Action buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <button className="flex-1 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-600 text-white px-4 sm:px-6 py-3 rounded-xl hover:from-blue-600 hover:via-purple-600 hover:to-blue-700 transition-all shadow-lg border border-blue-400 border-opacity-50 backdrop-blur-sm transform hover:scale-105 active:scale-95">
+                <div className="flex items-center justify-center space-x-2">
+                  <span>View on Farcaster</span>
+                </div>
+              </button>
+              <button className="flex-1 bg-gradient-to-r from-green-500 via-teal-500 to-green-600 text-white px-4 sm:px-6 py-3 rounded-xl hover:from-green-600 hover:via-teal-600 hover:to-green-700 transition-all shadow-lg border border-green-400 border-opacity-50 backdrop-blur-sm transform hover:scale-105 active:scale-95">
+                <div className="flex items-center justify-center space-x-2">
+                  <span>Collect</span>
+                </div>
+              </button>
+              <button className="flex-1 bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600 text-white px-4 sm:px-6 py-3 rounded-xl hover:from-pink-600 hover:via-rose-600 hover:to-pink-700 transition-all shadow-lg border border-pink-400 border-opacity-50 backdrop-blur-sm transform hover:scale-105 active:scale-95">
+                <div className="flex items-center justify-center space-x-2">
+                  <span>Share</span>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Hologram scan lines effect */}
-        <div className="absolute inset-0 pointer-events-none">
+        {/* Enhanced Hologram scan lines effect */}
+        <div className="absolute inset-0 pointer-events-none rounded-2xl overflow-hidden">
           <div 
-            className="absolute inset-0 opacity-10"
+            className="absolute inset-0 opacity-15"
             style={{
-              background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,255,0.3) 2px, rgba(0,255,255,0.3) 4px)',
-              animation: 'scanlines 0.1s linear infinite'
+              background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,255,0.4) 2px, rgba(0,255,255,0.4) 3px)',
+              animation: 'scanlines 0.08s linear infinite'
             }}
           ></div>
+          
+          {/* Data stream effect */}
+          <div 
+            className="absolute inset-0 opacity-20"
+            style={{
+              background: 'repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(0,200,255,0.2) 20px, rgba(0,200,255,0.2) 22px)',
+              animation: 'dataStream 2s linear infinite'
+            }}
+          ></div>
+          
+          {/* Glitch effect */}
+          <div 
+            className="absolute inset-0 opacity-5"
+            style={{
+              background: 'repeating-linear-gradient(45deg, transparent, transparent 1px, rgba(255,0,255,0.3) 1px, rgba(255,0,255,0.3) 2px)',
+              animation: 'glitch 3s ease-in-out infinite'
+            }}
+          ></div>
+        </div>
+        
+        {/* Floating hologram particles */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
+          {Array.from({ length: 8 }, (_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-cyan-400 rounded-full opacity-60"
+              style={{
+                left: `${(i * 13 + 10) % 90}%`,
+                top: `${(i * 17 + 15) % 80}%`,
+                animation: `float${i % 3} ${2 + (i % 3)}s ease-in-out infinite ${i * 0.3}s`
+              }}
+            />
+          ))}
         </div>
       </div>
 
@@ -190,23 +249,79 @@ export function HologramDisplay({ collectible, onClose }: HologramDisplayProps) 
   );
 }
 
-// Add hologram-specific animations
+// Add enhanced hologram-specific animations
 if (typeof window !== 'undefined' && !document.getElementById('hologram-animations')) {
   const style = document.createElement('style');
   style.id = 'hologram-animations';
   style.textContent = `
     @keyframes hologramGlow {
       0% { 
-        box-shadow: 0 0 50px rgba(59, 130, 246, 0.3), 0 0 100px rgba(59, 130, 246, 0.1); 
+        box-shadow: 0 0 50px rgba(6, 182, 212, 0.4), 0 0 100px rgba(59, 130, 246, 0.2), 0 0 150px rgba(168, 85, 247, 0.1); 
       }
       100% { 
-        box-shadow: 0 0 80px rgba(59, 130, 246, 0.6), 0 0 150px rgba(59, 130, 246, 0.3); 
+        box-shadow: 0 0 80px rgba(6, 182, 212, 0.8), 0 0 150px rgba(59, 130, 246, 0.5), 0 0 200px rgba(168, 85, 247, 0.3); 
       }
+    }
+    
+    @keyframes hologramFloat {
+      0%, 100% { transform: translateY(0px) rotateY(0deg); }
+      50% { transform: translateY(-5px) rotateY(2deg); }
     }
     
     @keyframes scanlines {
       0% { transform: translateY(-100%); }
       100% { transform: translateY(100vh); }
+    }
+    
+    @keyframes dataStream {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    
+    @keyframes glitch {
+      0%, 90%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-2px); }
+      40% { transform: translateX(2px); }
+      60% { transform: translateX(-1px); }
+      80% { transform: translateX(1px); }
+    }
+    
+    @keyframes float0 {
+      0%, 100% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-10px) scale(1.2); }
+    }
+    
+    @keyframes float1 {
+      0%, 100% { transform: translateY(0px) translateX(0px); }
+      33% { transform: translateY(-8px) translateX(3px); }
+      66% { transform: translateY(-5px) translateX(-3px); }
+    }
+    
+    @keyframes float2 {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.1); }
+    }
+    
+    .animate-spin-slow {
+      animation: spin 3s linear infinite;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 4px;
+    }
+    
+    .scrollbar-track-gray-800::-webkit-scrollbar-track {
+      background: rgba(31, 41, 55, 0.5);
+      border-radius: 2px;
+    }
+    
+    .scrollbar-thumb-cyan-500::-webkit-scrollbar-thumb {
+      background: rgba(6, 182, 212, 0.8);
+      border-radius: 2px;
+    }
+    
+    .scrollbar-thumb-cyan-500::-webkit-scrollbar-thumb:hover {
+      background: rgba(6, 182, 212, 1);
     }
   `;
   document.head.appendChild(style);

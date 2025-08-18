@@ -107,7 +107,7 @@ export default async function Image() {
                 justifyContent: "center",
                 position: "relative",
                 boxShadow: "0 16px 40px rgba(0, 0, 0, 0.4), inset 0 2px 8px rgba(255, 255, 255, 0.2)",
-                transform: "translateZ(20px)",
+                transform: "scale(1.05)",
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -153,7 +153,7 @@ export default async function Image() {
               backgroundClip: "text",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
-              transform: "perspective(800px) rotateX(15deg)",
+              transform: "rotateX(5deg)",
             }}
           >
             {PROJECT_TITLE}
@@ -188,7 +188,7 @@ export default async function Image() {
               border: "2px solid rgba(255, 255, 255, 0.3)",
               backdropFilter: "blur(12px)",
               boxShadow: "0 12px 40px rgba(0, 0, 0, 0.3), inset 0 2px 8px rgba(255, 255, 255, 0.1)",
-              transform: "perspective(400px) rotateX(5deg)",
+              transform: "rotateX(3deg)",
             }}
           >
             {/* 3D cube icon */}
