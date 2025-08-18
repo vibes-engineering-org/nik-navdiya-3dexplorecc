@@ -65,7 +65,7 @@ export function CollectibleExplorer() {
   };
 
   return (
-    <div className="w-full h-screen overflow-hidden">
+    <div className="w-full min-h-screen overflow-hidden">
       {currentView === 'selector' ? (
         <div className="relative">
           <PathSelector onPathSelected={handlePathSelected} />
@@ -79,7 +79,7 @@ export function CollectibleExplorer() {
           {/* Back to path selector button */}
           <button
             onClick={handleBackToSelector}
-            className="absolute top-6 left-6 bg-gray-800 bg-opacity-80 text-white px-4 py-2 rounded-lg hover:bg-opacity-100 transition-all z-10"
+            className="absolute top-16 right-6 bg-gray-800 bg-opacity-80 text-white px-4 py-2 rounded-lg hover:bg-opacity-100 transition-all z-10"
           >
             ← Change Path
           </button>

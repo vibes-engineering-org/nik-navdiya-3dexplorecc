@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { CollectiblesService } from '~/services/collectibles';
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,42 +15,33 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Mock user collectibles data
-    const mockCollectibles = [
-      {
-        id: '2',
-        hash: '0xfedcba0987654321',
-        author: {
-          fid: parseInt(fid),
-          username: 'user_creates',
-          display_name: 'User Creator',
-          pfp: {
-            url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'
-          }
-        },
-        text: 'My personal collection item. This represents my creative journey.',
-        timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-        embeds: [{
-          url: undefined,
-          metadata: {
-            image: {
-              url: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=400&fit=crop'
-            }
-          }
-        }],
-        reactions: {
-          likes_count: 89,
-          recasts_count: 16,
-          replies_count: 8
-        },
-        channel: undefined
+    // For now, return mock data. In production, this would:
+    // - Query Neynar API for user's casts
+    // - Filter for collectible/NFT-related content
+    // - Fetch additional metadata from Alchemy API
+    
+    const collectibles = CollectiblesService.getMockCollectibles('mycollection');
+    
+    // Update author info to match the requested FID
+    const userCollectibles = collectibles.map(collectible => ({
+      ...collectible,
+      author: {
+        ...collectible.author,
+        fid: parseInt(fid)
       }
-    ];
+    }));
+    
+    // Simulate pagination
+    const startIndex = cursor ? parseInt(cursor) : 0;
+    const endIndex = startIndex + limit;
+    const paginatedCollectibles = userCollectibles.slice(startIndex, endIndex);
+    const hasMore = endIndex < userCollectibles.length;
+    const nextCursor = hasMore ? endIndex.toString() : undefined;
 
     return NextResponse.json({
-      collectibles: mockCollectibles,
-      cursor: undefined,
-      hasMore: false
+      collectibles: paginatedCollectibles,
+      cursor: nextCursor,
+      hasMore
     });
   } catch (error) {
     console.error('Error fetching user collectibles:', error);

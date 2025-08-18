@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCollectiblesStore } from '~/store/collectibles';
 
 interface PathSelectorProps {
@@ -9,161 +9,340 @@ interface PathSelectorProps {
 
 export function PathSelector({ onPathSelected }: PathSelectorProps) {
   const [selectedPath, setSelectedPath] = useState<'recent' | 'mycollection' | null>(null);
+  const [isLaunching, setIsLaunching] = useState(false);
   const { setSelectedPath: setStorePath } = useCollectiblesStore();
 
   const handlePathSelect = (path: 'recent' | 'mycollection') => {
+    if (isLaunching) return;
+    
     setSelectedPath(path);
     setStorePath(path);
+    setIsLaunching(true);
     
-    // Delay to show selection animation
+    // Smooth transition with realistic timing
     setTimeout(() => {
       onPathSelected();
-    }, 800);
+    }, 2000);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-6">
-      <div className="max-w-4xl w-full">
-        {/* Title */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-white mb-4 animate-fade-in">
-            Farcaster Collectible Explorer
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900  overflow-y-auto">
+      {/* Animated background elements */}
+      <div className="fixed inset-0 pointer-events-none">
+        {/* Subtle animated stars */}
+        {Array.from({ length: 200 }, (_, i) => (
+          <div
+            key={i}
+            className="absolute bg-white rounded-full opacity-60"
+            style={{
+              width: `${Math.random() * 2 + 1}px`,
+              height: `${Math.random() * 2 + 1}px`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animation: `twinkle ${3 + Math.random() * 4}s ease-in-out infinite`,
+              animationDelay: `${Math.random() * 5}s`
+            }}
+          />
+        ))}
+        
+        {/* Floating nebula effects */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-cyan-600/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
+
+      {/* Launch overlay */}
+      {isLaunching && (
+        <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
+          <div className="text-center space-y-6">
+            {/* Launch animation */}
+            <div className="relative">
+              <div className="w-32 h-32 mx-auto mb-6 relative">
+                {/* Rocket ship */}
+                <div className="absolute inset-0 text-6xl animate-rocket-launch">🚀</div>
+                {/* Exhaust trail */}
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-4 h-16 bg-gradient-to-t from-orange-500 to-yellow-400 blur-sm animate-exhaust opacity-80"></div>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <h2 className="text-3xl font-bold text-white">
+                {selectedPath === 'recent' ? '🌌 Launching to Recent Discoveries' : '🛸 Accessing Your Fleet'}
+              </h2>
+              <p className="text-cyan-300 text-lg">Preparing cosmic navigation systems...</p>
+              
+              {/* Loading bar */}
+              <div className="w-80 h-2 bg-gray-800 rounded-full overflow-hidden mx-auto">
+                <div className="h-full bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full animate-loading-bar"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="max-w-6xl w-full mx-auto px-6 py-12 z-10">
+        {/* Header */}
+        <div className="text-center mb-8 md:mb-16">
+          <div className="inline-block mb-4 md:mb-6">
+            <div className="text-6xl md:text-8xl mb-2 md:mb-4 animate-float">🌌</div>
+          </div>
+          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-4 md:mb-6 leading-tight">
+            <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Universe Explorer
+            </span>
           </h1>
-          <p className="text-xl text-gray-300 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-            Choose your journey through the world of collectibles
+          <p className="text-lg md:text-xl lg:text-2xl text-slate-300 max-w-3xl mx-auto leading-relaxed px-4">
+            Navigate through the cosmos and discover Farcaster collectibles among the stars
           </p>
         </div>
 
-        {/* Path selection cards */}
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
-          {/* Recent/Top Path */}
+        {/* Path selection */}
+        <div className="flex flex-col md:flex-row gap-6 md:gap-8 max-w-5xl mx-auto">
+          {/* Recent Discoveries */}
           <div 
-            className={`relative cursor-pointer transform transition-all duration-500 hover:scale-105 ${
-              selectedPath === 'recent' ? 'scale-105 ring-4 ring-blue-400' : ''
-            }`}
+            className={`group cursor-pointer transition-all duration-700 ease-out transform ${
+              selectedPath === 'recent' 
+                ? 'scale-105 -translate-y-2' 
+                : 'hover:scale-105 hover:-translate-y-1'
+            } ${isLaunching ? 'pointer-events-none' : ''}`}
             onClick={() => handlePathSelect('recent')}
           >
-            <div className="bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl p-8 h-80 flex flex-col justify-between relative overflow-hidden">
-              {/* Background pattern */}
-              <div className="absolute inset-0 opacity-20">
-                <div className="absolute top-4 left-4 w-12 h-12 border-2 border-white rounded-full"></div>
-                <div className="absolute top-12 right-8 w-8 h-8 border-2 border-white rounded-full"></div>
-                <div className="absolute bottom-8 left-12 w-6 h-6 border-2 border-white rounded-full"></div>
-                <div className="absolute bottom-4 right-4 w-10 h-10 border-2 border-white rounded-full"></div>
-              </div>
-
-              <div>
-                <h2 className="text-3xl font-bold text-white mb-4">Recent & Top Collectibles</h2>
-                <p className="text-blue-100 text-lg leading-relaxed">
-                  Explore the latest and most popular collectibles from the Farcaster community. 
-                  Discover trending content and emerging creators.
-                </p>
-              </div>
-
-              <div className="flex items-center space-x-3">
-                <div className="flex -space-x-2">
-                  <div className="w-8 h-8 bg-pink-400 rounded-full border-2 border-white"></div>
-                  <div className="w-8 h-8 bg-yellow-400 rounded-full border-2 border-white"></div>
-                  <div className="w-8 h-8 bg-green-400 rounded-full border-2 border-white"></div>
+            <div className={`relative bg-gradient-to-br from-slate-800/50 to-slate-900/80 backdrop-blur-xl border-2 rounded-3xl p-6 md:p-8 h-80 md:h-96 transition-all duration-700 ${
+              selectedPath === 'recent' 
+                ? 'border-cyan-400 shadow-2xl shadow-cyan-400/25 bg-gradient-to-br from-cyan-900/20 to-slate-900/80' 
+                : 'border-slate-600/50 hover:border-cyan-400/50 hover:shadow-xl hover:shadow-cyan-400/10'
+            }`}>
+              {/* Header */}
+              <div className="flex items-center gap-4 mb-6">
+                <div className="text-4xl">🚀</div>
+                <div>
+                  <h2 className="text-2xl font-bold text-white group-hover:text-cyan-300 transition-colors">
+                    Recent Discoveries
+                  </h2>
+                  <p className="text-slate-400 text-sm">Latest cosmic findings</p>
                 </div>
-                <span className="text-blue-100 font-medium">Spring Vibes</span>
+              </div>
+
+              {/* Description */}
+              <p className="text-slate-300 text-lg leading-relaxed mb-8">
+                Explore recently discovered spaceships containing the latest collectible casts from across the galaxy. 
+                Discover trending content and emerging creators in the vast universe.
+              </p>
+
+              {/* Stats */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="flex -space-x-1">
+                    <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full border-2 border-white"></div>
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full border-2 border-white"></div>
+                    <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full border-2 border-white"></div>
+                  </div>
+                  <span className="text-slate-400 font-medium">Active explorers</span>
+                </div>
+                <div className="text-cyan-400 font-bold">∞ discoveries</div>
               </div>
 
               {/* Selection indicator */}
               {selectedPath === 'recent' && (
-                <div className="absolute inset-0 bg-white bg-opacity-20 flex items-center justify-center">
-                  <div className="text-white text-2xl font-bold animate-pulse">Selected!</div>
+                <div className="absolute inset-0 bg-cyan-400/10 backdrop-blur-sm rounded-3xl flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-4xl mb-2 animate-bounce">✨</div>
+                    <div className="text-cyan-300 text-xl font-bold">Mission Selected!</div>
+                  </div>
                 </div>
               )}
+
+              {/* Hover effect particles */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                {Array.from({ length: 5 }, (_, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-1 h-1 bg-cyan-400 rounded-full animate-ping"
+                    style={{
+                      left: `${20 + i * 15}%`,
+                      top: `${20 + (i % 2) * 40}%`,
+                      animationDelay: `${i * 0.2}s`
+                    }}
+                  />
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* My Collection Path */}
+          {/* Your Fleet */}
           <div 
-            className={`relative cursor-pointer transform transition-all duration-500 hover:scale-105 ${
-              selectedPath === 'mycollection' ? 'scale-105 ring-4 ring-orange-400' : ''
-            }`}
+            className={`group cursor-pointer transition-all duration-700 ease-out transform ${
+              selectedPath === 'mycollection' 
+                ? 'scale-105 -translate-y-2' 
+                : 'hover:scale-105 hover:-translate-y-1'
+            } ${isLaunching ? 'pointer-events-none' : ''}`}
             onClick={() => handlePathSelect('mycollection')}
           >
-            <div className="bg-gradient-to-br from-orange-600 to-red-600 rounded-2xl p-8 h-80 flex flex-col justify-between relative overflow-hidden">
-              {/* Background pattern */}
-              <div className="absolute inset-0 opacity-20">
-                <div className="absolute top-6 left-6 w-10 h-10 border-2 border-white transform rotate-45"></div>
-                <div className="absolute top-16 right-6 w-6 h-6 border-2 border-white transform rotate-12"></div>
-                <div className="absolute bottom-12 left-8 w-8 h-8 border-2 border-white transform -rotate-12"></div>
-                <div className="absolute bottom-6 right-12 w-12 h-12 border-2 border-white transform rotate-45"></div>
-              </div>
-
-              <div>
-                <h2 className="text-3xl font-bold text-white mb-4">My Collection</h2>
-                <p className="text-orange-100 text-lg leading-relaxed">
-                  Journey through your personal collection of Farcaster casts and collectibles. 
-                  Revisit your favorite moments and creations.
-                </p>
-              </div>
-
-              <div className="flex items-center space-x-3">
-                <div className="flex -space-x-2">
-                  <div className="w-8 h-8 bg-red-400 rounded-full border-2 border-white"></div>
-                  <div className="w-8 h-8 bg-orange-400 rounded-full border-2 border-white"></div>
-                  <div className="w-8 h-8 bg-yellow-600 rounded-full border-2 border-white"></div>
+            <div className={`relative bg-gradient-to-br from-slate-800/50 to-slate-900/80 backdrop-blur-xl border-2 rounded-3xl p-6 md:p-8 h-80 md:h-96 transition-all duration-700 ${
+              selectedPath === 'mycollection' 
+                ? 'border-purple-400 shadow-2xl shadow-purple-400/25 bg-gradient-to-br from-purple-900/20 to-slate-900/80' 
+                : 'border-slate-600/50 hover:border-purple-400/50 hover:shadow-xl hover:shadow-purple-400/10'
+            }`}>
+              {/* Header */}
+              <div className="flex items-center gap-4 mb-6">
+                <div className="text-4xl">🛸</div>
+                <div>
+                  <h2 className="text-2xl font-bold text-white group-hover:text-purple-300 transition-colors">
+                    Your Fleet
+                  </h2>
+                  <p className="text-slate-400 text-sm">Personal collection</p>
                 </div>
-                <span className="text-orange-100 font-medium">Autumn Journey</span>
+              </div>
+
+              {/* Description */}
+              <p className="text-slate-300 text-lg leading-relaxed mb-8">
+                Navigate to your personal fleet of collected spaceships and explore your NFT treasures. 
+                Revisit your favorite cosmic moments and digital artifacts.
+              </p>
+
+              {/* Stats */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="flex -space-x-1">
+                    <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full border-2 border-white"></div>
+                    <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-red-500 rounded-full border-2 border-white"></div>
+                    <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-orange-500 rounded-full border-2 border-white"></div>
+                  </div>
+                  <span className="text-slate-400 font-medium">Your assets</span>
+                </div>
+                <div className="text-purple-400 font-bold">∞ treasures</div>
               </div>
 
               {/* Selection indicator */}
               {selectedPath === 'mycollection' && (
-                <div className="absolute inset-0 bg-white bg-opacity-20 flex items-center justify-center">
-                  <div className="text-white text-2xl font-bold animate-pulse">Selected!</div>
+                <div className="absolute inset-0 bg-purple-400/10 backdrop-blur-sm rounded-3xl flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-4xl mb-2 animate-bounce">🌟</div>
+                    <div className="text-purple-300 text-xl font-bold">Fleet Accessed!</div>
+                  </div>
                 </div>
               )}
+
+              {/* Hover effect particles */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                {Array.from({ length: 5 }, (_, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-1 h-1 bg-purple-400 rounded-full animate-ping"
+                    style={{
+                      left: `${20 + i * 15}%`,
+                      top: `${20 + (i % 2) * 40}%`,
+                      animationDelay: `${i * 0.2}s`
+                    }}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Instructions */}
-        <div className="text-center">
-          <p className="text-gray-400 text-lg">
-            Click on a path to begin your 3D collectible journey
+        <div className="text-center mt-12 md:mt-16">
+          <p className="text-lg md:text-xl text-slate-400 mb-6">
+            Choose your cosmic journey to begin exploring the universe of collectibles
           </p>
-          <div className="mt-4 flex justify-center space-x-6 text-sm text-gray-500">
-            <span>• Use arrow keys to navigate</span>
-            <span>• Click stones to view collectibles</span>
-            <span>• Press ESC to close hologram</span>
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 md:gap-8 text-sm text-slate-500">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🖱️</span>
+              <span>Drag to explore universe</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🔍</span>
+              <span>Scroll to zoom in/out</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-lg">⌨️</span>
+              <span>WASD to navigate</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🛸</span>
+              <span>Click spaceships to discover</span>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-blue-400 rounded-full animate-twinkle"></div>
-        <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-purple-400 rounded-full animate-twinkle" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute bottom-1/4 left-1/3 w-1.5 h-1.5 bg-pink-400 rounded-full animate-twinkle" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute bottom-1/3 right-1/4 w-1 h-1 bg-cyan-400 rounded-full animate-twinkle" style={{ animationDelay: '1.5s' }}></div>
       </div>
     </div>
   );
 }
 
-// Add path selector animations
-if (typeof window !== 'undefined' && !document.getElementById('path-selector-animations')) {
+// Enhanced animations with better performance
+if (typeof window !== 'undefined' && !document.getElementById('universe-selector-animations')) {
   const style = document.createElement('style');
-  style.id = 'path-selector-animations';
+  style.id = 'universe-selector-animations';
   style.textContent = `
-    @keyframes fade-in {
-      from { 
-        opacity: 0; 
-        transform: translateY(20px); 
+    @keyframes twinkle {
+      0%, 100% { 
+        opacity: 0.3; 
+        transform: scale(0.8); 
       }
-      to { 
+      50% { 
         opacity: 1; 
-        transform: translateY(0); 
+        transform: scale(1.2); 
       }
     }
     
-    .animate-fade-in {
-      animation: fade-in 1s ease-out forwards;
-      opacity: 0;
+    @keyframes float {
+      0%, 100% { 
+        transform: translateY(0px) rotate(0deg); 
+      }
+      33% { 
+        transform: translateY(-10px) rotate(5deg); 
+      }
+      66% { 
+        transform: translateY(-5px) rotate(-3deg); 
+      }
+    }
+    
+    @keyframes rocket-launch {
+      0% { 
+        transform: translateY(0px) rotate(0deg) scale(1); 
+      }
+      50% { 
+        transform: translateY(-20px) rotate(15deg) scale(1.1); 
+      }
+      100% { 
+        transform: translateY(-100px) rotate(45deg) scale(0.8); 
+      }
+    }
+    
+    @keyframes exhaust {
+      0%, 100% { 
+        height: 1rem; 
+        opacity: 0.6; 
+      }
+      50% { 
+        height: 2rem; 
+        opacity: 1; 
+      }
+    }
+    
+    @keyframes loading-bar {
+      0% { 
+        width: 0%; 
+      }
+      100% { 
+        width: 100%; 
+      }
+    }
+    
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .animate-rocket-launch {
+      animation: rocket-launch 2s ease-out forwards;
+    }
+    
+    .animate-exhaust {
+      animation: exhaust 0.3s ease-in-out infinite;
+    }
+    
+    .animate-loading-bar {
+      animation: loading-bar 2s ease-out forwards;
     }
   `;
   document.head.appendChild(style);

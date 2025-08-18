@@ -43,8 +43,6 @@ interface CollectiblesState {
   myCollectibles: Collectible[];
   
   // 3D scene state
-  bikePosition: number;
-  currentCollectibleIndex: number;
   selectedCollectible: Collectible | null;
   showHologram: boolean;
   isLoading: boolean;
@@ -55,14 +53,10 @@ interface CollectiblesActions {
   setSelectedPath: (path: 'recent' | 'mycollection') => void;
   setRecentCollectibles: (collectibles: Collectible[]) => void;
   setMyCollectibles: (collectibles: Collectible[]) => void;
-  setBikePosition: (position: number) => void;
-  setCurrentCollectibleIndex: (index: number) => void;
   setSelectedCollectible: (collectible: Collectible | null) => void;
   setShowHologram: (show: boolean) => void;
   setIsLoading: (loading: boolean) => void;
   setHasReachedEnd: (end: boolean) => void;
-  moveBike: (direction: 'forward' | 'backward') => void;
-  startAutoCycling: () => NodeJS.Timeout | undefined;
   loadMoreCollectibles: () => Promise<void>;
 }
 
@@ -74,54 +68,12 @@ export function CollectiblesProvider({ children }: { children: ReactNode }) {
   const [selectedPath, setSelectedPath] = useState<'recent' | 'mycollection'>('recent');
   const [recentCollectibles, setRecentCollectibles] = useState<Collectible[]>([]);
   const [myCollectibles, setMyCollectibles] = useState<Collectible[]>([]);
-  const [bikePosition, setBikePosition] = useState(0);
-  const [currentCollectibleIndex, setCurrentCollectibleIndex] = useState(0);
   const [selectedCollectible, setSelectedCollectible] = useState<Collectible | null>(null);
   const [showHologram, setShowHologram] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [hasReachedEnd, setHasReachedEnd] = useState(false);
 
-  const moveBike = (direction: 'forward' | 'backward') => {
-    const currentCollectibles = selectedPath === 'recent' ? recentCollectibles : myCollectibles;
-    
-    let newPosition = bikePosition;
-    let newIndex = currentCollectibleIndex;
-    
-    if (direction === 'forward' && newIndex < currentCollectibles.length - 1) {
-      newPosition += 100; // More realistic movement per step
-      newIndex += 1;
-    } else if (direction === 'backward' && newIndex > 0) {
-      newPosition -= 100; // More realistic movement per step
-      newIndex -= 1;
-    }
-    
-    const reachedEnd = newIndex >= currentCollectibles.length - 1 && currentCollectibles.length > 0;
-    
-    setBikePosition(newPosition);
-    setCurrentCollectibleIndex(newIndex);
-    setHasReachedEnd(reachedEnd);
-  };
 
-  // Auto-cycling demo mode for better user experience
-  const startAutoCycling = () => {
-    const currentCollectibles = selectedPath === 'recent' ? recentCollectibles : myCollectibles;
-    if (currentCollectibles.length === 0) return;
-
-    let autoIndex = 0;
-    const autoCycleInterval = setInterval(() => {
-      if (autoIndex < currentCollectibles.length - 1) {
-        setBikePosition(autoIndex * 100);
-        setCurrentCollectibleIndex(autoIndex);
-        setHasReachedEnd(false);
-        autoIndex++;
-      } else {
-        setHasReachedEnd(true);
-        clearInterval(autoCycleInterval);
-      }
-    }, 2000); // Move every 2 seconds for demo
-
-    return autoCycleInterval;
-  };
 
   const loadMoreCollectibles = async () => {
     setIsLoading(true);
@@ -139,8 +91,6 @@ export function CollectiblesProvider({ children }: { children: ReactNode }) {
     selectedPath,
     recentCollectibles,
     myCollectibles,
-    bikePosition,
-    currentCollectibleIndex,
     selectedCollectible,
     showHologram,
     isLoading,
@@ -148,14 +98,10 @@ export function CollectiblesProvider({ children }: { children: ReactNode }) {
     setSelectedPath,
     setRecentCollectibles,
     setMyCollectibles,
-    setBikePosition,
-    setCurrentCollectibleIndex,
     setSelectedCollectible,
     setShowHologram,
     setIsLoading,
     setHasReachedEnd,
-    moveBike,
-    startAutoCycling,
     loadMoreCollectibles
   };
 
