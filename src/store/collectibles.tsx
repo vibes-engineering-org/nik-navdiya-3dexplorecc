@@ -62,6 +62,7 @@ interface CollectiblesActions {
   setIsLoading: (loading: boolean) => void;
   setHasReachedEnd: (end: boolean) => void;
   moveBike: (direction: 'forward' | 'backward') => void;
+  startAutoCycling: () => NodeJS.Timeout | undefined;
   loadMoreCollectibles: () => Promise<void>;
 }
 
@@ -87,10 +88,10 @@ export function CollectiblesProvider({ children }: { children: ReactNode }) {
     let newIndex = currentCollectibleIndex;
     
     if (direction === 'forward' && newIndex < currentCollectibles.length - 1) {
-      newPosition += 10;
+      newPosition += 100; // More realistic movement per step
       newIndex += 1;
     } else if (direction === 'backward' && newIndex > 0) {
-      newPosition -= 10;
+      newPosition -= 100; // More realistic movement per step
       newIndex -= 1;
     }
     
@@ -99,6 +100,27 @@ export function CollectiblesProvider({ children }: { children: ReactNode }) {
     setBikePosition(newPosition);
     setCurrentCollectibleIndex(newIndex);
     setHasReachedEnd(reachedEnd);
+  };
+
+  // Auto-cycling demo mode for better user experience
+  const startAutoCycling = () => {
+    const currentCollectibles = selectedPath === 'recent' ? recentCollectibles : myCollectibles;
+    if (currentCollectibles.length === 0) return;
+
+    let autoIndex = 0;
+    const autoCycleInterval = setInterval(() => {
+      if (autoIndex < currentCollectibles.length - 1) {
+        setBikePosition(autoIndex * 100);
+        setCurrentCollectibleIndex(autoIndex);
+        setHasReachedEnd(false);
+        autoIndex++;
+      } else {
+        setHasReachedEnd(true);
+        clearInterval(autoCycleInterval);
+      }
+    }, 2000); // Move every 2 seconds for demo
+
+    return autoCycleInterval;
   };
 
   const loadMoreCollectibles = async () => {
@@ -133,6 +155,7 @@ export function CollectiblesProvider({ children }: { children: ReactNode }) {
     setIsLoading,
     setHasReachedEnd,
     moveBike,
+    startAutoCycling,
     loadMoreCollectibles
   };
 

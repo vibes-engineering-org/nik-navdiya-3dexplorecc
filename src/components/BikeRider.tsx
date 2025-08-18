@@ -92,27 +92,62 @@ export function BikeRider({ position, isMoving }: BikeRiderProps) {
             <div className="w-1.5 h-5 bg-gradient-to-b from-amber-200 to-amber-300 transform -rotate-30 absolute -right-2 rounded-full shadow-md"></div>
           </div>
           
-          {/* Pedaling Legs with animation */}
+          {/* Enhanced Pedaling Legs with realistic cycling animation */}
           <div className="absolute top-8 left-1/2 transform -translate-x-1/2">
+            {/* Left leg with realistic pedaling motion */}
             <div 
-              className={`w-1.5 h-6 bg-gradient-to-b from-blue-600 to-blue-700 transform absolute -left-1 rounded-full shadow-md transition-transform duration-300 ${
-                isMoving ? 'animate-pulse' : ''
-              }`}
+              className="w-1.5 h-6 bg-gradient-to-b from-blue-600 to-blue-700 transform absolute -left-1 rounded-full shadow-md transition-transform duration-500 ease-in-out"
               style={{
                 transformOrigin: 'top center',
-                transform: isMoving ? 'rotate(20deg)' : 'rotate(0deg)'
+                transform: isMoving ? 'rotate(25deg)' : 'rotate(5deg)',
+                animation: isMoving ? 'pedalLeft 1s ease-in-out infinite' : 'none'
               }}
-            ></div>
+            >
+              {/* Thigh segment */}
+              <div 
+                className="w-1 h-3 bg-gradient-to-b from-blue-500 to-blue-600 absolute top-0 left-0.5 rounded-full"
+                style={{
+                  transform: isMoving ? 'rotate(10deg)' : 'rotate(0deg)'
+                }}
+              ></div>
+            </div>
+
+            {/* Right leg with opposite pedaling motion */}
             <div 
-              className={`w-1.5 h-6 bg-gradient-to-b from-blue-600 to-blue-700 transform absolute -right-1 rounded-full shadow-md transition-transform duration-300 ${
-                isMoving ? 'animate-pulse' : ''
-              }`}
+              className="w-1.5 h-6 bg-gradient-to-b from-blue-600 to-blue-700 transform absolute -right-1 rounded-full shadow-md transition-transform duration-500 ease-in-out"
               style={{
                 transformOrigin: 'top center',
-                transform: isMoving ? 'rotate(-20deg)' : 'rotate(0deg)'
+                transform: isMoving ? 'rotate(-25deg)' : 'rotate(-5deg)',
+                animation: isMoving ? 'pedalRight 1s ease-in-out infinite 0.5s' : 'none'
               }}
-            ></div>
+            >
+              {/* Thigh segment */}
+              <div 
+                className="w-1 h-3 bg-gradient-to-b from-blue-500 to-blue-600 absolute top-0 right-0.5 rounded-full"
+                style={{
+                  transform: isMoving ? 'rotate(-10deg)' : 'rotate(0deg)'
+                }}
+              ></div>
+            </div>
           </div>
+
+          {/* Add pedaling animation styles */}
+          <style jsx>{`
+            @keyframes pedalLeft {
+              0% { transform: rotate(5deg); }
+              25% { transform: rotate(35deg); }
+              50% { transform: rotate(25deg); }
+              75% { transform: rotate(-5deg); }
+              100% { transform: rotate(5deg); }
+            }
+            @keyframes pedalRight {
+              0% { transform: rotate(-5deg); }
+              25% { transform: rotate(-35deg); }
+              50% { transform: rotate(-25deg); }
+              75% { transform: rotate(5deg); }
+              100% { transform: rotate(-5deg); }
+            }
+          `}</style>
           
           {/* Feet/Pedals */}
           <div className="absolute top-14 left-1/2 transform -translate-x-1/2">
