@@ -10,6 +10,8 @@ import { HologramDisplay } from './HologramDisplay';
 export function Scene3D() {
   const sceneRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMoving, setIsMoving] = useState(false);
+  const movingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const {
     selectedPath,
@@ -37,17 +39,17 @@ export function Scene3D() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Handle keyboard navigation
+  // Enhanced keyboard navigation with movement detection
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       switch (event.key) {
         case 'ArrowUp':
           event.preventDefault();
-          moveBike('forward');
+          handleMovement(() => moveBike('forward'));
           break;
         case 'ArrowDown':
           event.preventDefault();
-          moveBike('backward');
+          handleMovement(() => moveBike('backward'));
           break;
       }
     };
@@ -55,6 +57,20 @@ export function Scene3D() {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [moveBike]);
+
+  // Movement detection function
+  const handleMovement = (moveAction: () => void) => {
+    setIsMoving(true);
+    moveAction();
+    
+    if (movingTimeoutRef.current) {
+      clearTimeout(movingTimeoutRef.current);
+    }
+    
+    movingTimeoutRef.current = setTimeout(() => {
+      setIsMoving(false);
+    }, 800);
+  };
 
   // Handle stone interaction
   const handleStoneClick = (collectible: Collectible, index: number) => {
@@ -82,10 +98,10 @@ export function Scene3D() {
   return (
     <div 
       ref={sceneRef}
-      className="relative w-full h-screen overflow-hidden bg-gradient-to-b from-sky-300 via-sky-200 to-green-200"
+      className="relative w-full h-screen overflow-hidden bg-gradient-to-b from-sky-300 via-sky-200 to-green-200 touch-none select-none"
       style={{
-        perspective: '1000px',
-        perspectiveOrigin: 'center center'
+        perspective: '1200px',
+        perspectiveOrigin: 'center 60%'
       }}
     >
       {/* 3D Scene Container */}
@@ -115,10 +131,10 @@ export function Scene3D() {
           />
         ))}
 
-        {/* Bike Rider */}
+        {/* Enhanced Bike Rider with movement detection */}
         <BikeRider 
           position={bikePosition}
-          isMoving={false}
+          isMoving={isMoving}
         />
 
         {/* End of road barrier */}
@@ -136,37 +152,42 @@ export function Scene3D() {
         )}
       </div>
 
-      {/* Enhanced Mobile Navigation Controls */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-3 px-4 py-2 bg-black bg-opacity-60 backdrop-blur-sm rounded-2xl border border-white border-opacity-20">
+      {/* Enhanced Mobile Navigation Controls with movement detection */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-3 px-4 py-3 bg-black bg-opacity-60 backdrop-blur-sm rounded-2xl border border-white border-opacity-20 shadow-2xl">
         <button
-          onClick={() => moveBike('backward')}
-          className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 disabled:from-gray-500 disabled:to-gray-600 text-white p-3 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50"
+          onClick={() => handleMovement(() => moveBike('backward'))}
+          className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 disabled:from-gray-500 disabled:to-gray-600 text-white p-3 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 touch-manipulation"
           disabled={currentCollectibleIndex <= 0}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
         
-        {/* Position Progress Bar */}
-        <div className="flex flex-col items-center min-w-[120px]">
-          <div className="text-white text-xs font-medium mb-1">
-            {currentCollectibleIndex + 1} of {currentCollectibles.length}
+        {/* Enhanced Position Progress Bar */}
+        <div className="flex flex-col items-center min-w-[140px] px-2">
+          <div className="text-white text-sm font-medium mb-1">
+            <span className="text-cyan-400">{currentCollectibleIndex + 1}</span>
+            <span className="text-gray-400 mx-1">of</span>
+            <span className="text-purple-400">{currentCollectibles.length}</span>
           </div>
-          <div className="w-20 h-1 bg-gray-700 rounded-full overflow-hidden">
+          <div className="w-24 h-2 bg-gray-700 rounded-full overflow-hidden shadow-inner">
             <div 
-              className="h-full bg-gradient-to-r from-purple-400 to-blue-400 transition-all duration-300"
+              className="h-full bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 transition-all duration-500 ease-out shadow-sm"
               style={{ width: `${((currentCollectibleIndex + 1) / currentCollectibles.length) * 100}%` }}
             />
+          </div>
+          <div className="text-xs text-gray-400 mt-1">
+            {selectedPath === 'recent' ? 'Recent NFTs' : 'My Collection'}
           </div>
         </div>
 
         <button
-          onClick={() => moveBike('forward')}
-          className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 disabled:from-gray-500 disabled:to-gray-600 text-white p-3 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50"
+          onClick={() => handleMovement(() => moveBike('forward'))}
+          className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 disabled:from-gray-500 disabled:to-gray-600 text-white p-3 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 touch-manipulation"
           disabled={hasReachedEnd}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>

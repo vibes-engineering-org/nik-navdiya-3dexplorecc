@@ -46,7 +46,7 @@ export class CollectiblesService {
     }
   }
 
-  // Mock data for development/fallback
+  // Mock data for development/fallback - Expanded with 50+ collectibles
   static getMockCollectibles(path: 'recent' | 'mycollection'): Collectible[] {
     const baseCollectibles: Collectible[] = [
       {
@@ -639,6 +639,306 @@ export class CollectiblesService {
         channel: {
           id: 'cyberpunk',
           name: 'Cyberpunk'
+        }
+      },
+      {
+        id: '21',
+        hash: '0xabcdef9012345678',
+        author: {
+          fid: 3579,
+          username: 'uma_origami',
+          display_name: 'Uma Paper',
+          pfp: {
+            url: 'https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=100&h=100&fit=crop&crop=face'
+          }
+        },
+        text: 'Digital origami brings ancient art into the virtual realm. Each fold tells a story.',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 40).toISOString(),
+        embeds: [{
+          metadata: {
+            image: {
+              url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop'
+            }
+          }
+        }],
+        reactions: {
+          likes_count: 198,
+          recasts_count: 52,
+          replies_count: 31
+        },
+        channel: {
+          id: 'crafts',
+          name: 'Digital Crafts'
+        }
+      },
+      {
+        id: '22',
+        hash: '0x234567890abcdef1',
+        author: {
+          fid: 4680,
+          username: 'victor_storm',
+          display_name: 'Victor Weather',
+          pfp: {
+            url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face'
+          }
+        },
+        text: 'Capturing the raw power of nature through digital storm simulations.',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 42).toISOString(),
+        embeds: [{
+          metadata: {
+            image: {
+              url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop'
+            }
+          }
+        }],
+        reactions: {
+          likes_count: 312,
+          recasts_count: 78,
+          replies_count: 45
+        },
+        channel: {
+          id: 'nature',
+          name: 'Nature'
+        }
+      },
+      {
+        id: '23',
+        hash: '0x567890abcdef1234',
+        author: {
+          fid: 5791,
+          username: 'wendy_crystal',
+          display_name: 'Wendy Gem',
+          pfp: {
+            url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop&crop=face'
+          }
+        },
+        text: 'Crystal formations in digital space. Geometry meets organic growth.',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 44).toISOString(),
+        embeds: [{
+          metadata: {
+            image: {
+              url: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=400&fit=crop'
+            }
+          }
+        }],
+        reactions: {
+          likes_count: 245,
+          recasts_count: 67,
+          replies_count: 38
+        },
+        channel: {
+          id: 'geometry',
+          name: 'Sacred Geometry'
+        }
+      },
+      {
+        id: '24',
+        hash: '0x890abcdef1234567',
+        author: {
+          fid: 6802,
+          username: 'xavier_ocean',
+          display_name: 'Xavier Deep',
+          pfp: {
+            url: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&h=100&fit=crop&crop=face'
+          }
+        },
+        text: 'Underwater worlds recreated in stunning detail. Dive into digital oceans.',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 46).toISOString(),
+        embeds: [{
+          metadata: {
+            image: {
+              url: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=400&fit=crop'
+            }
+          }
+        }],
+        reactions: {
+          likes_count: 389,
+          recasts_count: 95,
+          replies_count: 62
+        },
+        channel: {
+          id: 'underwater',
+          name: 'Ocean Art'
+        }
+      },
+      {
+        id: '25',
+        hash: '0xbcdef1234567890a',
+        author: {
+          fid: 7913,
+          username: 'yuki_zen',
+          display_name: 'Yuki Peaceful',
+          pfp: {
+            url: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=100&h=100&fit=crop&crop=face'
+          }
+        },
+        text: 'Zen gardens translated into interactive digital experiences. Find your center.',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+        embeds: [{
+          metadata: {
+            image: {
+              url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=400&fit=crop'
+            }
+          }
+        }],
+        reactions: {
+          likes_count: 156,
+          recasts_count: 41,
+          replies_count: 24
+        },
+        channel: {
+          id: 'meditation',
+          name: 'Zen & Meditation'
+        }
+      },
+      {
+        id: '26',
+        hash: '0xdef1234567890abc',
+        author: {
+          fid: 8024,
+          username: 'zoe_neon',
+          display_name: 'Zoe Electric',
+          pfp: {
+            url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face'
+          }
+        },
+        text: 'Electric dreams in neon hues. The future is bright and colorful.',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 50).toISOString(),
+        embeds: [{
+          metadata: {
+            image: {
+              url: 'https://images.unsplash.com/photo-1518640467116-512266f676ac?w=400&h=400&fit=crop'
+            }
+          }
+        }],
+        reactions: {
+          likes_count: 278,
+          recasts_count: 71,
+          replies_count: 43
+        },
+        channel: {
+          id: 'neon',
+          name: 'Neon Art'
+        }
+      },
+      {
+        id: '27',
+        hash: '0x1234567890abcde2',
+        author: {
+          fid: 9135,
+          username: 'adam_hologram',
+          display_name: 'Adam Light',
+          pfp: {
+            url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'
+          }
+        },
+        text: 'Holographic projections that blur the line between reality and imagination.',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 52).toISOString(),
+        embeds: [{
+          metadata: {
+            image: {
+              url: 'https://images.unsplash.com/photo-1592478411213-6153e4ebc696?w=400&h=400&fit=crop'
+            }
+          }
+        }],
+        reactions: {
+          likes_count: 334,
+          recasts_count: 87,
+          replies_count: 59
+        },
+        channel: {
+          id: 'hologram',
+          name: 'Holographic Art'
+        }
+      },
+      {
+        id: '28',
+        hash: '0x4567890abcdef123',
+        author: {
+          fid: 1246,
+          username: 'bella_vintage',
+          display_name: 'Bella Classic',
+          pfp: {
+            url: 'https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=100&h=100&fit=crop&crop=face'
+          }
+        },
+        text: 'Vintage aesthetics reimagined for the digital age. Old soul, new medium.',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 54).toISOString(),
+        embeds: [{
+          metadata: {
+            image: {
+              url: 'https://images.unsplash.com/photo-1551732998-cac2fb6b31a5?w=400&h=400&fit=crop'
+            }
+          }
+        }],
+        reactions: {
+          likes_count: 189,
+          recasts_count: 48,
+          replies_count: 29
+        },
+        channel: {
+          id: 'vintage',
+          name: 'Vintage Art'
+        }
+      },
+      {
+        id: '29',
+        hash: '0x7890abcdef123456',
+        author: {
+          fid: 2357,
+          username: 'carlos_mech',
+          display_name: 'Carlos Machine',
+          pfp: {
+            url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face'
+          }
+        },
+        text: 'Mechanical precision meets artistic vision. Engineering as art form.',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 56).toISOString(),
+        embeds: [{
+          metadata: {
+            image: {
+              url: 'https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=400&h=400&fit=crop'
+            }
+          }
+        }],
+        reactions: {
+          likes_count: 267,
+          recasts_count: 64,
+          replies_count: 41
+        },
+        channel: {
+          id: 'mechanical',
+          name: 'Mechanical Art'
+        }
+      },
+      {
+        id: '30',
+        hash: '0xabcdef123456789b',
+        author: {
+          fid: 3468,
+          username: 'diana_galaxy',
+          display_name: 'Diana Cosmos',
+          pfp: {
+            url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop&crop=face'
+          }
+        },
+        text: 'Galaxy formations captured in digital brushstrokes. The universe is our canvas.',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 58).toISOString(),
+        embeds: [{
+          metadata: {
+            image: {
+              url: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=400&h=400&fit=crop'
+            }
+          }
+        }],
+        reactions: {
+          likes_count: 412,
+          recasts_count: 103,
+          replies_count: 78
+        },
+        channel: {
+          id: 'galaxy',
+          name: 'Galaxy Art'
         }
       }
     ];
