@@ -15,18 +15,20 @@ import {
   KeyboardControls
 } from '@react-three/drei';
 import * as THREE from 'three';
-import { useCollectiblesStore, Collectible } from '~/store/collectibles';
+import { useCollectiblesStore } from '~/store/collectibles';
+import { useRecentMintEvents } from '~/hooks/use-recent-mints';
+import { useContractNFTs } from '~/hooks/use-contract-nfts';
 
 // Spaceship Component representing collectible casts
 function Spaceship({ 
-  collectible, 
+  item, 
   position, 
   onSpaceshipClick,
   showHologram 
 }: { 
-  collectible: Collectible; 
+  item: any; 
   position: [number, number, number]; 
-  onSpaceshipClick: (collectible: Collectible) => void;
+  onSpaceshipClick: (id: string) => void;
   showHologram: boolean;
 }) {
   const spaceshipRef = useRef<THREE.Group>(null);
@@ -51,7 +53,7 @@ function Spaceship({
       <Float speed={1} rotationIntensity={0.3} floatIntensity={0.8}>
         <group
           ref={spaceshipRef}
-          onClick={() => onSpaceshipClick(collectible)}
+          onClick={() => onSpaceshipClick(item.id)}
           onPointerEnter={() => setHovered(true)}
           onPointerLeave={() => setHovered(false)}
         >
@@ -201,55 +203,49 @@ function Spaceship({
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-400/20 to-transparent opacity-30 animate-pulse rounded-xl"></div>
                 
                 <div className="relative z-10 space-y-3">
-                  {/* Author info */}
-                  <div className="flex items-center space-x-3">
-                    <img 
-                      src={collectible.author.pfp.url} 
-                      alt={collectible.author.display_name}
-                      className="w-10 h-10 rounded-full border-2 border-cyan-400 shadow-lg"
-                    />
-                    <div>
-                      <p className="font-semibold text-cyan-300 text-sm">
-                        {collectible.author.display_name}
-                      </p>
-                      <p className="text-cyan-500 text-xs">
-                        @{collectible.author.username}
-                      </p>
+                  {/* NFT / Minter info (if available) */}
+                  {(item.minter?.username || item.minter?.display_name || item.minter?.pfp_url) && (
+                    <div className="flex items-center space-x-3">
+                      {item.minter?.pfp_url ? (
+                        <img src={item.minter.pfp_url} alt={item.minter?.display_name || item.minter?.username || 'Minter'} className="w-10 h-10 rounded-full border-2 border-cyan-400 shadow-lg" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-cyan-500/20 border-2 border-cyan-400" />
+                      )}
+                      <div>
+                        <p className="font-semibold text-cyan-300 text-sm">
+                          {item.minter?.display_name || 'Unknown Minter'}
+                        </p>
+                        {item.minter?.username && (
+                          <p className="text-cyan-500 text-xs">@{item.minter.username}</p>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
                   
                   {/* Content */}
                   <div className="space-y-2">
-                    <p className="text-white text-sm leading-relaxed">
-                      {collectible.text.slice(0, 120)}...
-                    </p>
+                    {item.title && (
+                      <p className="text-white text-sm font-semibold">{item.title}</p>
+                    )}
+                    {item.description && (
+                      <p className="text-white/90 text-xs leading-relaxed">{item.description}</p>
+                    )}
                     
                     {/* Media preview */}
-                    {collectible.embeds[0]?.metadata?.image && (
-                      <img 
-                        src={collectible.embeds[0].metadata.image.url}
-                        alt="Collectible preview"
-                        className="w-full h-24 object-cover rounded border border-cyan-400/50"
-                      />
+                    {item.image && (
+                      <img src={item.image} alt="Collectible preview" className="w-full h-24 object-cover rounded border border-cyan-400/50" />
                     )}
                   </div>
                   
-                  {/* Stats */}
-                  <div className="flex justify-between text-xs">
-                    <span className="text-pink-400 flex items-center gap-1">
-                      ❤️ {collectible.reactions.likes_count}
-                    </span>
-                    <span className="text-green-400 flex items-center gap-1">
-                      🔄 {collectible.reactions.recasts_count}
-                    </span>
-                    <span className="text-blue-400 flex items-center gap-1">
-                      💬 {collectible.reactions.replies_count}
-                    </span>
+                  {/* Token and chain */}
+                  <div className="flex flex-wrap gap-2 text-xs text-cyan-300">
+                    {item.tokenId && <span># {item.tokenId}</span>}
+                    {item.chain && <span>• {item.chain}</span>}
                   </div>
 
                   {/* Timestamp */}
                   <div className="text-gray-400 text-xs">
-                    {new Date(collectible.timestamp).toLocaleDateString()}
+                    {item.timestamp ? new Date(item.timestamp).toLocaleDateString() : ''}
                   </div>
                 </div>
               </div>
@@ -463,31 +459,56 @@ function SpaceExplorationCamera() {
 
 // Main Universe Scene Component
 export function UniverseScene() {
-  const {
-    recentCollectibles,
-    myCollectibles,
-    selectedPath,
-    selectedCollectible,
-    setSelectedCollectible,
-    setShowHologram
-  } = useCollectiblesStore();
+  const { selectedPath } = useCollectiblesStore();
+  const { recentMints, isLoading: isLoadingRecent } = useRecentMintEvents();
+  const { userNFTs, isLoadingUserNFTs } = useContractNFTs();
 
   const [hoveredSpaceship, setHoveredSpaceship] = useState<string | null>(null);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
-  // Get current collectibles based on selected path
-  const currentCollectibles = selectedPath === 'recent' ? recentCollectibles : myCollectibles;
+  type SpaceItem = {
+    id: string;
+    tokenId?: string;
+    image?: string;
+    title?: string;
+    description?: string;
+    chain?: string;
+    timestamp?: number;
+    minter?: { username?: string; display_name?: string; pfp_url?: string } | null;
+  };
+
+  // Map hooks to unified items
+  const recentItems: SpaceItem[] = useMemo(() => {
+    return (recentMints || []).map((m) => ({
+      id: m.transactionHash || m.tokenId,
+      tokenId: m.tokenId,
+      image: m.metadata?.image || (m.metadata as any)?.image_url,
+      title: m.metadata?.name,
+      description: m.metadata?.description as any,
+      chain: m.chain,
+      timestamp: m.timestamp,
+      minter: m.minterFarcasterUser || null,
+    }));
+  }, [recentMints]);
+
+  const userItems: SpaceItem[] = useMemo(() => {
+    return (userNFTs || []).map((n) => ({
+      id: `user-${n.tokenId}`,
+      tokenId: n.tokenId,
+      image: n.metadata?.image || (n.metadata as any)?.image_url,
+      title: n.metadata?.name,
+      description: n.metadata?.description as any,
+      chain: n.chain,
+      timestamp: n.mintTime ? Date.parse(n.mintTime) : undefined,
+      minter: null,
+    }));
+  }, [userNFTs]);
+
+  const currentItems = selectedPath === 'recent' ? recentItems : userItems;
 
   // Handle spaceship click
-  const handleSpaceshipClick = (collectible: Collectible) => {
-    if (selectedCollectible?.id === collectible.id) {
-      // If clicking the same spaceship, close hologram
-      setSelectedCollectible(null);
-      setShowHologram(false);
-    } else {
-      // Show hologram for new spaceship
-      setSelectedCollectible(collectible);
-      setShowHologram(true);
-    }
+  const handleSpaceshipClick = (id: string) => {
+    setSelectedItemId((prev) => (prev === id ? null : id));
   };
 
   // Generate spaceship positions in a 3D spiral around the universe
@@ -528,13 +549,13 @@ export function UniverseScene() {
         <UniverseEnvironment />
         
         {/* Spaceship Collectibles */}
-        {currentCollectibles.map((collectible, index) => (
+        {currentItems.map((item, index) => (
           <Spaceship
-            key={collectible.id}
-            collectible={collectible}
+            key={item.id}
+            item={item}
             position={getSpaceshipPosition(index)}
             onSpaceshipClick={handleSpaceshipClick}
-            showHologram={selectedCollectible?.id === collectible.id}
+            showHologram={selectedItemId === item.id}
           />
         ))}
 
@@ -549,22 +570,25 @@ export function UniverseScene() {
       <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black/70 text-white p-4 rounded-lg backdrop-blur-sm border border-cyan-400/50">
         <div className="text-center space-y-2">
           <p className="text-sm text-cyan-300">🚀 Exploring the Universe</p>
-          <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-xs text-gray-300">
+          <div className="grid-cols-2 gap-x-8 gap-y-1 text-xs hidden md:grid text-gray-300">
             <span>🖱️ Drag to rotate</span>
             <span>🔍 Scroll to zoom</span>
             <span>⌨️ WASD/Arrows to fly</span>
             <span>Q/E for up/down</span>
-            <span>🛸 Click spaceships</span>
+            <span> Click spaceships</span>
             <span>Right-click + drag to pan</span>
           </div>
+          <div className="md:hiddengrid grid-cols-2 gap-x-8 gap-y-1 text-xs text-gray-300">
+            🛸Touch spaceships to view collectibles
+          </div>
           <p className="text-xs text-cyan-400">
-            {currentCollectibles.length} spaceships discovered in {selectedPath === 'recent' ? 'recent space' : 'your fleet'}
+            {currentItems.length} spaceships discovered in {selectedPath === 'recent' ? 'recent space' : 'your fleet'}
           </p>
         </div>
       </div>
 
       {/* Collection Info */}
-      <div className="absolute top-16 left-6 bg-black/70 text-white p-4 rounded-lg backdrop-blur-sm border border-cyan-400/50">
+      <div className="absolute hidden md:block top-16 left-6 bg-black/70 text-white p-4 rounded-lg backdrop-blur-sm border border-cyan-400/50">
         <h2 className="text-lg font-bold text-cyan-300 mb-2">
           {selectedPath === 'recent' ? '🌌 Recent Discoveries' : '🚁 Your Fleet'}
         </h2>
