@@ -18,6 +18,7 @@ interface NFTMetadata {
   description?: string;
   image?: string;
   image_url?: string;
+  external_url?: string;
   attributes?: Array<{
     trait_type: string;
     value: string | number;
@@ -38,9 +39,10 @@ interface RecentMintNFT {
   transactionHash: string;
   timestamp?: number;
   minterFarcasterUser?: FarcasterUser | null;
+  autherFarcasterUser?: FarcasterUser | null;
 }
 
-interface FarcasterUser {
+export interface FarcasterUser {
   fid: number;
   username: string;
   display_name: string;
@@ -65,7 +67,6 @@ export function useRecentMintEvents(): UseRecentMintEventsReturn {
   // Initialize Alchemy SDK
   const getAlchemy = () => {
     const apiKey = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
-    console.log('Alchemy:', apiKey);
     if (!apiKey) {
       throw new Error('NEXT_PUBLIC_ALCHEMY_KEY is not configured');
     }
@@ -91,21 +92,7 @@ export function useRecentMintEvents(): UseRecentMintEventsReturn {
   // Function to fetch Farcaster user by address using Neynar API
   const fetchFarcasterUserByAddress = useCallback(async (address: string): Promise<FarcasterUser | null> => {
     try {
-      const apiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
-      if (!apiKey) {
-        console.warn('No Neynar API key found');
-        return null;
-      }
-      console.log('Fetching Farcaster user by address:', apiKey);
-      const url = `https://api.neynar.com/v2/farcaster/user/bulk-by-address?addresses=${encodeURIComponent(address)}`;
-
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          accept: 'application/json',
-          api_key: apiKey,
-        },
-      });
+      const response = await fetch(`/api/farcasterByAddress?address=${address}`);
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -193,6 +180,20 @@ export function useRecentMintEvents(): UseRecentMintEventsReturn {
     return logs;
   }, []);
 
+  const fetchFarcasteUserByFid = useCallback(async (fid: string): Promise<FarcasterUser | null> => {
+    const response = await fetch(`/api/farcasterByFid?fid=${fid}`);
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return null;
+      }
+      console.warn(`Neynar API error: ${response.status}`);
+      return null;
+    }
+    return response.json();
+  }, []);
+
+
   // Function to fetch recent mint events
   const fetchRecentMints = useCallback(async () => {
     setIsLoading(true);
@@ -233,15 +234,17 @@ export function useRecentMintEvents(): UseRecentMintEventsReturn {
       for (const event of mintEvents) {
         try {
           // Fetch metadata and Farcaster user in parallel
-          const [metadata, minterFarcasterUser] = await Promise.all([
+          const [metadata, minterFarcasterUser, autherFarcasterUser] = await Promise.all([
             fetchNFTMetadata(event.tokenId),
-            fetchFarcasterUserByAddress(event.to)
+            fetchFarcasterUserByAddress(event.to),
+            fetchFarcasteUserByFid(event.fid)
           ]);
 
           recentMintsWithMetadata.push({
             ...event,
             metadata,
             minterFarcasterUser,
+            autherFarcasterUser,
             contractAddress: CONTRACT_ADDRESS,
             chain: 'base'
           });

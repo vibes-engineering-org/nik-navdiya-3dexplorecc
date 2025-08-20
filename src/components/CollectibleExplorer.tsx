@@ -38,7 +38,7 @@ export function CollectibleExplorer() {
             onClick={handleBackToSelector}
             className="absolute top-16 right-6 bg-gray-800 bg-opacity-80 text-white px-4 py-2 rounded-lg hover:bg-opacity-100 transition-all z-10"
           >
-            ← Change Path
+            ← <span className="text-xs hidden md:inline">Change Path</span>
           </button>
         </div>
       )}

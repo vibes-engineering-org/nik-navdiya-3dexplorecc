@@ -120,22 +120,23 @@ export function CollectibleModal({ item, isOpen, onClose }: CollectibleModalProp
           {/* Technical Details */}
           <div className="grid grid-cols-2 gap-4 p-4 bg-blue-900/20 rounded-xl border border-blue-400/20">
             <div>
-              <h5 className="text-blue-300 text-sm font-medium">Token ID</h5>
+              <h5 className="text-blue-300 text-sm font-medium">Auther</h5>
+                <p className="text-white capitalize">{item.auther?.display_name || 'Unknown Auther'}</p>
+            </div>
+            <div>
+              <h5 className="text-blue-300 text-sm font-medium">Minter</h5>
+              <p className="text-white capitalize">{item.minter?.display_name || 'Unknown Minter'}</p>
+            </div>
+            <div>
+              <h5 className="text-blue-300 text-sm font-medium col-span-2">Token ID</h5>
               <p className="text-white font-mono">#{item.tokenId || 'N/A'}</p>
             </div>
-            <div>
-              <h5 className="text-blue-300 text-sm font-medium">Chain</h5>
-              <p className="text-white capitalize">{item.chain || 'Unknown'}</p>
-            </div>
-            <div>
-              <h5 className="text-blue-300 text-sm font-medium">Contract</h5>
-              <p className="text-white font-mono text-xs">{item.contractAddress || 'N/A'}</p>
-            </div>
-            <div>
-              <h5 className="text-blue-300 text-sm font-medium">Minted</h5>
-              <p className="text-white text-sm">{formatTimestamp(item.timestamp)}</p>
+            <div onClick={() => window.open(item.castUrl, '_blank')} className="cursor-pointer">
+              <h5 className="text-blue-300 text-sm font-medium col-span-2">Cast URL</h5>
+              <p className="text-gray-300 font-mono text-xs break-all">{item.castUrl}</p>
             </div>
           </div>
+
 
           {/* Transaction Hash */}
           {item.transactionHash && (
@@ -152,6 +153,7 @@ export function CollectibleModal({ item, isOpen, onClose }: CollectibleModalProp
               <p className="text-gray-300 font-mono text-xs break-all">{item.castHash}</p>
             </div>
           )}
+
         </div>
       </div>
     </div>

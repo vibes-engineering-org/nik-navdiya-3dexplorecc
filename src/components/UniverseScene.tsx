@@ -153,25 +153,25 @@ function NFTCard({
             <div className="w-80 h-96 bg-gradient-to-br from-gray-900/95 to-blue-900/95 backdrop-blur-md rounded-xl p-6 border border-blue-400/50 shadow-2xl">
               {/* Header with PFP and username */}
               <div className="flex items-center space-x-3 mb-4">
-                {item.minter?.pfp_url ? (
+                {item.auther?.pfp_url ? (
                   <img 
-                    src={item.minter.pfp_url} 
-                    alt={item.minter?.display_name || item.minter?.username || 'Minter'} 
+                    src={item.auther.pfp_url} 
+                    alt={item.auther?.display_name || item.auther?.username || 'Auther'} 
                     className="w-12 h-12 rounded-full border-2 border-blue-400 shadow-lg"
                   />
                 ) : (
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-2 border-blue-400 flex items-center justify-center">
                     <span className="text-blue-300 text-lg font-bold">
-                      {item.minter?.username?.[0]?.toUpperCase() || '?'}
+                      {item.auther?.username?.[0]?.toUpperCase() || '?'}
                     </span>
                   </div>
                 )}
                 <div className="flex-1">
                   <p className="font-semibold text-blue-300 text-base">
-                    {item.minter?.display_name || 'Unknown Minter'}
+                    {item.auther?.display_name || 'Unknown Auther'}
                   </p>
-                  {item.minter?.username && (
-                    <p className="text-blue-400 text-sm">@{item.minter.username}</p>
+                  {item.auther?.username && (
+                    <p className="text-blue-400 text-sm">@{item.auther.username}</p>
                   )}
                 </div>
               </div>
@@ -215,11 +215,7 @@ function NFTCard({
                 </button>
               </div>
 
-              {/* Footer info */}
-              <div className="mt-4 pt-3 border-t border-blue-400/30 flex justify-between items-center text-xs text-blue-400">
-                <span>#{item.tokenId || 'N/A'}</span>
-                <span>{item.chain || 'unknown'}</span>
-              </div>
+              
             </div>
           </Html>
 
@@ -448,7 +444,9 @@ export function UniverseScene() {
     description?: string;
     chain?: string;
     timestamp?: number;
+    castUrl?: string;
     minter?: { username?: string; display_name?: string; pfp_url?: string } | null;
+    auther?: { username?: string; display_name?: string; pfp_url?: string } | null;
   };
 
   // Map hooks to unified items
@@ -461,7 +459,9 @@ export function UniverseScene() {
       description: m.metadata?.description as any,
       chain: m.chain,
       timestamp: m.timestamp,
+      castUrl: m.metadata?.external_url,
       minter: m.minterFarcasterUser || null,
+      auther: m.autherFarcasterUser || null,
     }));
   }, [recentMints]);
 
@@ -474,7 +474,9 @@ export function UniverseScene() {
       description: n.metadata?.description as any,
       chain: n.chain,
       timestamp: n.mintTime ? Date.parse(n.mintTime) : undefined,
+      castUrl: n.metadata?.external_url,
       minter: null,
+      auther: n.auther || null,
     }));
   }, [userNFTs]);
 

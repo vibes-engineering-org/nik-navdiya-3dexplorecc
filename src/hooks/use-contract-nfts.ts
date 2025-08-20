@@ -2,12 +2,15 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAccount } from 'wagmi';
+import { fetchFarcasteUserByFid } from '~/lib/facaster';
+import { FarcasterUser } from './use-recent-mints';
 
 interface NFTMetadata {
   name?: string;
   description?: string;
   image?: string;
   image_url?: string;
+  external_url?: string;
   attributes?: Array<{
     trait_type: string;
     value: string | number;
@@ -22,6 +25,7 @@ interface NFTToken {
   contractAddress: string;
   chain: string;
   mintTime?: string;
+  auther?: FarcasterUser | null;
 }
 
 interface UseContractNFTsReturn {
@@ -82,6 +86,10 @@ export function useContractNFTs(): UseContractNFTsReturn {
     }
   }, []);
 
+  const fetchAuther = useCallback(async (username: string): Promise<FarcasterUser | null> => {
+    const response = await fetch(`/api/farcasterByUsername?username=${username}`);
+    return response.json();
+  }, []);
 
   // Fetch user's NFTs from the contract
   const fetchUserNFTs = useCallback(async () => {
@@ -111,11 +119,13 @@ export function useContractNFTs(): UseContractNFTsReturn {
 
       for (const nft of data.ownedNfts || []) {
         const metadata = nft.metadata || await fetchNFTMetadata(nft.tokenId);
+        const auther = await fetchAuther(metadata?.attributes?.find((attr: any) => attr.trait_type === 'auther')?.value);
         nfts.push({
           tokenId: nft.tokenId,
           metadata,
           contractAddress: CONTRACT_ADDRESS,
-          chain: 'base'
+          chain: 'base',
+          auther
         });
       }
 
