@@ -19,6 +19,7 @@ import { useCollectiblesStore } from '~/store/collectibles';
 import { useRecentMintEvents } from '~/hooks/use-recent-mints';
 import { useContractNFTs } from '~/hooks/use-contract-nfts';
 import { CollectibleModal } from './CollectibleModal';
+import { useProfile } from '~/hooks/use-profile';
 
 // 3D NFT Card Component representing collectible casts
 function NFTCard({ 
@@ -431,6 +432,8 @@ export function UniverseScene() {
   const { selectedPath } = useCollectiblesStore();
   const { recentMints, isLoading: isLoadingRecent } = useRecentMintEvents();
   const { userNFTs, isLoadingUserNFTs } = useContractNFTs();
+  const { username, displayName, pfpUrl, fid } = useProfile();
+
 
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<any>(null);
@@ -475,7 +478,7 @@ export function UniverseScene() {
       chain: n.chain,
       timestamp: n.mintTime ? Date.parse(n.mintTime) : undefined,
       castUrl: n.metadata?.external_url,
-      minter: null,
+      minter: { username, display_name: displayName, pfp_url:pfpUrl, fid },
       auther: n.auther || null,
     }));
   }, [userNFTs]);
@@ -514,7 +517,7 @@ export function UniverseScene() {
   };
 
   return (
-    <div className="w-full h-screen">
+    <div className="w-full h-screen relative">
       <Canvas
         shadows
         camera={{ position: [0, 0, 50], fov: 75 }}
@@ -523,6 +526,7 @@ export function UniverseScene() {
           toneMapping: THREE.ACESFilmicToneMapping,
           powerPreference: "high-performance"
         }}
+        style={{ position: 'relative', zIndex: 1 }}
       >
         {/* Lighting for space environment */}
         <ambientLight intensity={0.2} />
@@ -556,7 +560,7 @@ export function UniverseScene() {
       </Canvas>
 
       {/* UI Controls */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black/70 text-white p-4 rounded-lg backdrop-blur-sm border border-cyan-400/50">
+      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black/70 text-white p-4 rounded-lg backdrop-blur-sm border border-cyan-400/50 z-10">
         <div className="text-center space-y-2">
           <p className="text-sm text-cyan-300">🚀 Exploring the Universe</p>
           <div className="grid-cols-2 gap-x-8 gap-y-1 text-xs hidden md:grid text-gray-300">
@@ -577,7 +581,7 @@ export function UniverseScene() {
       </div>
 
       {/* Collection Info */}
-      <div className="absolute hidden md:block top-16 left-6 bg-black/70 text-white p-4 rounded-lg backdrop-blur-sm border border-cyan-400/50">
+      <div className="absolute hidden md:block top-16 left-6 bg-black/70 text-white p-4 rounded-lg backdrop-blur-sm border border-cyan-400/50 z-10">
         <h2 className="text-lg font-bold text-cyan-300 mb-2">
           {selectedPath === 'recent' ? '🌌 Recent Discoveries' : '🚁 Your Fleet'}
         </h2>

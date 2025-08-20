@@ -24,7 +24,7 @@ export function CollectibleModal({ item, isOpen, onClose }: CollectibleModalProp
   };
 
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
@@ -121,17 +121,17 @@ export function CollectibleModal({ item, isOpen, onClose }: CollectibleModalProp
           <div className="grid grid-cols-2 gap-4 p-4 bg-blue-900/20 rounded-xl border border-blue-400/20">
             <div>
               <h5 className="text-blue-300 text-sm font-medium">Auther</h5>
-                <p className="text-white capitalize">{item.auther?.display_name || 'Unknown Auther'}</p>
+                <p className="text-white capitalize" onClick={() => window.open(`https://www.farcaster.xyz/${item.auther?.username}`, '_blank')}>@{item.auther?.username || 'Unknown Auther'}</p>
             </div>
             <div>
               <h5 className="text-blue-300 text-sm font-medium">Minter</h5>
-              <p className="text-white capitalize">{item.minter?.display_name || 'Unknown Minter'}</p>
+              <p className="text-white capitalize" onClick={() => window.open(`https://www.farcaster.xyz/${item.minter?.username}`, '_blank')}>@{item.minter?.username || 'Unknown Minter'}</p>
             </div>
-            <div>
-              <h5 className="text-blue-300 text-sm font-medium col-span-2">Token ID</h5>
+            <div className="col-span-2">
+              <h5 className="text-blue-300 text-sm font-medium">Token ID</h5>
               <p className="text-white font-mono">#{item.tokenId || 'N/A'}</p>
             </div>
-            <div onClick={() => window.open(item.castUrl, '_blank')} className="cursor-pointer">
+            <div onClick={() => window.open(item.castUrl, '_blank')} className="cursor-pointer col-span-2">
               <h5 className="text-blue-300 text-sm font-medium col-span-2">Cast URL</h5>
               <p className="text-gray-300 font-mono text-xs break-all">{item.castUrl}</p>
             </div>

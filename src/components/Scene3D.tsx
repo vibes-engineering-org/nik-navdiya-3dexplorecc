@@ -6,7 +6,9 @@ export function Scene3D() {
   return (
     <div className="relative w-full min-h-screen">
       {/* Universe Scene with integrated holographic cards */}
-      <UniverseScene />
+      <div className="relative z-0">
+        <UniverseScene />
+      </div>
     </div>
   );
 }
