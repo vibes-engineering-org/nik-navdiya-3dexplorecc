@@ -428,7 +428,7 @@ function SpaceExplorationCamera() {
 }
 
 // Main Universe Scene Component
-export function UniverseScene() {
+export function UniverseScene({ setCurrentView }: { setCurrentView: React.Dispatch<React.SetStateAction<'selector' | 'explorer'>> }) {
   const { selectedPath } = useCollectiblesStore();
   const { recentMints, isLoading: isLoadingRecent } = useRecentMintEvents();
   const { userNFTs, isLoadingUserNFTs } = useContractNFTs();
@@ -592,6 +592,13 @@ export function UniverseScene() {
           {hoveredCard ? `Scanning: ${hoveredCard}` : 'Navigate to discover'}
         </div>
       </div>
+      {/* Back to path selector button */}
+          <button
+            onClick={() => setCurrentView('selector')}
+            className="absolute top-16 right-6 bg-gray-800 bg-opacity-80 text-white px-4 py-2 rounded-lg hover:bg-opacity-100 transition-all z-10"
+          >
+            ← <span className="text-xs hidden md:inline">Change Path</span>
+          </button>
 
       {/* Collectible Modal */}
       <CollectibleModal

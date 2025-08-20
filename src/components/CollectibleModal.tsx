@@ -129,7 +129,7 @@ export function CollectibleModal({ item, isOpen, onClose }: CollectibleModalProp
             </div>
             <div className="col-span-2">
               <h5 className="text-blue-300 text-sm font-medium">Token ID</h5>
-              <p className="text-white font-mono">#{item.tokenId || 'N/A'}</p>
+              <p className="text-white font-mono break-all">#{item.tokenId || 'N/A'}</p>
             </div>
             <div onClick={() => window.open(item.castUrl, '_blank')} className="cursor-pointer col-span-2">
               <h5 className="text-blue-300 text-sm font-medium col-span-2">Cast URL</h5>
