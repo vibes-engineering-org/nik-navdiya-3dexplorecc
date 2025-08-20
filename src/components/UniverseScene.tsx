@@ -18,138 +18,226 @@ import * as THREE from 'three';
 import { useCollectiblesStore } from '~/store/collectibles';
 import { useRecentMintEvents } from '~/hooks/use-recent-mints';
 import { useContractNFTs } from '~/hooks/use-contract-nfts';
+import { CollectibleModal } from './CollectibleModal';
 
-// Spaceship Component representing collectible casts
-function Spaceship({ 
+// 3D NFT Card Component representing collectible casts
+function NFTCard({ 
   item, 
   position, 
-  onSpaceshipClick,
-  showHologram 
+  onCardClick,
+  onSeeMoreClick
 }: { 
   item: any; 
   position: [number, number, number]; 
-  onSpaceshipClick: (id: string) => void;
-  showHologram: boolean;
+  onCardClick: (id: string) => void;
+  onSeeMoreClick: (id: string) => void;
 }) {
-  const spaceshipRef = useRef<THREE.Group>(null);
+  const cardRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
 
   useFrame((state) => {
-    if (spaceshipRef.current) {
-      // Gentle floating and rotation animation
-      spaceshipRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.5) * 0.2;
-      spaceshipRef.current.rotation.y += 0.005;
+    if (cardRef.current) {
+      // Gentle floating animation
+      cardRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.8) * 0.1;
+      cardRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.3) * 0.05;
       
-      // Glowing effect when hovered
+      // Subtle tilt when hovered
       if (hovered) {
-        spaceshipRef.current.rotation.x += 0.01;
-        spaceshipRef.current.rotation.z += 0.01;
+        cardRef.current.rotation.x = THREE.MathUtils.lerp(cardRef.current.rotation.x, 0.1, 0.1);
+        cardRef.current.rotation.z = THREE.MathUtils.lerp(cardRef.current.rotation.z, 0.05, 0.1);
+      } else {
+        cardRef.current.rotation.x = THREE.MathUtils.lerp(cardRef.current.rotation.x, 0, 0.1);
+        cardRef.current.rotation.z = THREE.MathUtils.lerp(cardRef.current.rotation.z, 0, 0.1);
       }
     }
   });
 
+  // Get preview text (first few words)
+  const getPreviewText = (text: string | undefined) => {
+    if (!text) return "No description available";
+    const words = text.split(' ');
+    return words.length > 8 ? words.slice(0, 8).join(' ') + '...' : text;
+  };
+
   return (
     <group position={position}>
-      <Float speed={1} rotationIntensity={0.3} floatIntensity={0.8}>
+      <Float speed={0.5} rotationIntensity={0.1} floatIntensity={0.3}>
         <group
-          ref={spaceshipRef}
-          onClick={() => onSpaceshipClick(item.id)}
+          ref={cardRef}
+          onClick={() => onCardClick(item.id)}
           onPointerEnter={() => setHovered(true)}
           onPointerLeave={() => setHovered(false)}
         >
-          {/* Main Spaceship Hull */}
+          {/* Card Base */}
           <mesh>
-            <coneGeometry args={[1, 3, 8]} />
+            <boxGeometry args={[4, 5, 0.2]} />
             <meshStandardMaterial 
-              color={hovered ? "#00ffff" : "#silver"} 
-              metalness={0.9}
-              roughness={0.1}
-              emissive={hovered ? "#0088cc" : "#000000"}
-              emissiveIntensity={hovered ? 0.3 : 0}
+              color={hovered ? "#1a1a2e" : "#16213e"} 
+              metalness={0.1}
+              roughness={0.3}
+              emissive={hovered ? "#0f3460" : "#000000"}
+              emissiveIntensity={hovered ? 0.2 : 0}
             />
           </mesh>
 
-          {/* Spaceship Wings */}
-          <mesh position={[-1.5, 0, 0]} rotation={[0, 0, Math.PI / 4]}>
-            <boxGeometry args={[0.3, 2, 0.1]} />
-            <meshStandardMaterial color="#4169E1" metalness={0.8} roughness={0.2} />
-          </mesh>
-          <mesh position={[1.5, 0, 0]} rotation={[0, 0, -Math.PI / 4]}>
-            <boxGeometry args={[0.3, 2, 0.1]} />
-            <meshStandardMaterial color="#4169E1" metalness={0.8} roughness={0.2} />
-          </mesh>
-
-          {/* Engine Exhausts */}
-          <group position={[0, -2, 0]}>
-            <mesh position={[-0.5, 0, 0]}>
-              <cylinderGeometry args={[0.2, 0.3, 0.8]} />
-              <meshStandardMaterial 
-                color="#ff4500" 
-                emissive="#ff2200"
-                emissiveIntensity={0.5}
-              />
-            </mesh>
-            <mesh position={[0.5, 0, 0]}>
-              <cylinderGeometry args={[0.2, 0.3, 0.8]} />
-              <meshStandardMaterial 
-                color="#ff4500" 
-                emissive="#ff2200"
-                emissiveIntensity={0.5}
-              />
-            </mesh>
-            <mesh position={[0, 0, 0]}>
-              <cylinderGeometry args={[0.15, 0.25, 1]} />
-              <meshStandardMaterial 
-                color="#ff6600" 
-                emissive="#ff3300"
-                emissiveIntensity={0.6}
-              />
-            </mesh>
-          </group>
-
-          {/* Energy Core */}
-          <mesh position={[0, 0.5, 0]}>
-            <sphereGeometry args={[0.3]} />
+          {/* Card Border/Frame */}
+          <mesh position={[0, 0, 0.11]}>
+            <boxGeometry args={[3.8, 4.8, 0.05]} />
             <meshStandardMaterial 
-              color="#00ffff" 
-              emissive="#0088ff"
-              emissiveIntensity={0.8}
-              transparent
-              opacity={0.8}
+              color={hovered ? "#00d4ff" : "#0066cc"} 
+              metalness={0.8}
+              roughness={0.2}
+              emissive={hovered ? "#0088ff" : "#004488"}
+              emissiveIntensity={0.3}
             />
           </mesh>
 
-          {/* Navigation Lights */}
-          {Array.from({ length: 4 }, (_, i) => (
-            <mesh key={i} position={[
-              Math.cos((i * Math.PI * 2) / 4) * 1.2,
-              0.8,
-              Math.sin((i * Math.PI * 2) / 4) * 1.2
-            ]}>
-              <sphereGeometry args={[0.1]} />
-              <meshStandardMaterial 
-                color="#00ff00" 
-                emissive="#00ff00"
-                emissiveIntensity={1}
-              />
-            </mesh>
-          ))}
+          {/* Glowing edges when hovered */}
+          {hovered && (
+            <>
+              {/* Top edge */}
+              <mesh position={[0, 2.4, 0.12]}>
+                <boxGeometry args={[3.8, 0.05, 0.05]} />
+                <meshStandardMaterial 
+                  color="#00ffff" 
+                  emissive="#00ffff"
+                  emissiveIntensity={1}
+                  transparent
+                  opacity={0.8}
+                />
+              </mesh>
+              {/* Bottom edge */}
+              <mesh position={[0, -2.4, 0.12]}>
+                <boxGeometry args={[3.8, 0.05, 0.05]} />
+                <meshStandardMaterial 
+                  color="#00ffff" 
+                  emissive="#00ffff"
+                  emissiveIntensity={1}
+                  transparent
+                  opacity={0.8}
+                />
+              </mesh>
+              {/* Left edge */}
+              <mesh position={[-1.9, 0, 0.12]}>
+                <boxGeometry args={[0.05, 4.8, 0.05]} />
+                <meshStandardMaterial 
+                  color="#00ffff" 
+                  emissive="#00ffff"
+                  emissiveIntensity={1}
+                  transparent
+                  opacity={0.8}
+                />
+              </mesh>
+              {/* Right edge */}
+              <mesh position={[1.9, 0, 0.12]}>
+                <boxGeometry args={[0.05, 4.8, 0.05]} />
+                <meshStandardMaterial 
+                  color="#00ffff" 
+                  emissive="#00ffff"
+                  emissiveIntensity={1}
+                  transparent
+                  opacity={0.8}
+                />
+              </mesh>
+            </>
+          )}
 
-          {/* Energy Particles around spaceship when hovered */}
+          {/* Card Content Overlay */}
+          <Html
+            position={[0, 0, 0.15]}
+            center
+            distanceFactor={8}
+            transform
+            sprite
+          >
+            <div className="w-80 h-96 bg-gradient-to-br from-gray-900/95 to-blue-900/95 backdrop-blur-md rounded-xl p-6 border border-blue-400/50 shadow-2xl">
+              {/* Header with PFP and username */}
+              <div className="flex items-center space-x-3 mb-4">
+                {item.minter?.pfp_url ? (
+                  <img 
+                    src={item.minter.pfp_url} 
+                    alt={item.minter?.display_name || item.minter?.username || 'Minter'} 
+                    className="w-12 h-12 rounded-full border-2 border-blue-400 shadow-lg"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-2 border-blue-400 flex items-center justify-center">
+                    <span className="text-blue-300 text-lg font-bold">
+                      {item.minter?.username?.[0]?.toUpperCase() || '?'}
+                    </span>
+                  </div>
+                )}
+                <div className="flex-1">
+                  <p className="font-semibold text-blue-300 text-base">
+                    {item.minter?.display_name || 'Unknown Minter'}
+                  </p>
+                  {item.minter?.username && (
+                    <p className="text-blue-400 text-sm">@{item.minter.username}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* NFT Image */}
+              {item.image && (
+                <div className="mb-4 rounded-lg overflow-hidden border border-blue-400/30">
+                  <img 
+                    src={item.image} 
+                    alt="NFT preview" 
+                    className="w-full h-32 object-cover"
+                  />
+                </div>
+              )}
+
+              {/* NFT Title */}
+              {item.title && (
+                <h3 className="text-white text-lg font-semibold mb-2 line-clamp-2">
+                  {item.title}
+                </h3>
+              )}
+
+              {/* Preview text */}
+              <div className="space-y-3 flex-1">
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  {getPreviewText(item.description)}
+                </p>
+                
+                {/* See More Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSeeMoreClick(item.id);
+                  }}
+                  className="inline-flex items-center px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 text-sm rounded-lg border border-blue-400/50 transition-all duration-200 hover:border-blue-300"
+                >
+                  See More
+                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Footer info */}
+              <div className="mt-4 pt-3 border-t border-blue-400/30 flex justify-between items-center text-xs text-blue-400">
+                <span>#{item.tokenId || 'N/A'}</span>
+                <span>{item.chain || 'unknown'}</span>
+              </div>
+            </div>
+          </Html>
+
+          {/* Floating particles around card when hovered */}
           {hovered && (
             <group>
-              {Array.from({ length: 8 }, (_, i) => (
-                <Float key={i} speed={3} rotationIntensity={2} floatIntensity={3}>
+              {Array.from({ length: 12 }, (_, i) => (
+                <Float key={i} speed={2 + i * 0.2} rotationIntensity={1} floatIntensity={2}>
                   <mesh position={[
-                    Math.cos((i * Math.PI * 2) / 8) * 2.5,
-                    Math.sin(i * 0.7) * 1,
-                    Math.sin((i * Math.PI * 2) / 8) * 2.5
+                    (Math.random() - 0.5) * 8,
+                    (Math.random() - 0.5) * 8,
+                    (Math.random() - 0.5) * 3
                   ]}>
-                    <sphereGeometry args={[0.08]} />
+                    <sphereGeometry args={[0.03]} />
                     <meshStandardMaterial 
-                      color="#00ffff" 
-                      emissive="#0088ff"
-                      emissiveIntensity={1}
+                      color="#00d4ff"
+                      emissive="#00d4ff"
+                      emissiveIntensity={0.8}
                       transparent
                       opacity={0.7}
                     />
@@ -160,121 +248,6 @@ function Spaceship({
           )}
         </group>
       </Float>
-
-      {/* 3D Holographic Card above spaceship */}
-      {showHologram && (
-        <group position={[0, 4, 0]}>
-          <Float speed={0.5} rotationIntensity={0.2} floatIntensity={0.5}>
-            {/* Holographic Base */}
-            <mesh>
-              <planeGeometry args={[4, 5]} />
-              <meshStandardMaterial 
-                color="#00ffff"
-                transparent
-                opacity={0.1}
-                emissive="#0088ff"
-                emissiveIntensity={0.3}
-                side={THREE.DoubleSide}
-              />
-            </mesh>
-
-            {/* Holographic Frame */}
-            <mesh position={[0, 0, 0.01]}>
-              <ringGeometry args={[1.8, 2.1, 32]} />
-              <meshStandardMaterial 
-                color="#00ffff"
-                emissive="#0088ff"
-                emissiveIntensity={0.8}
-                transparent
-                opacity={0.8}
-              />
-            </mesh>
-
-            {/* Content Overlay */}
-            <Html
-              position={[0, 0, 0.1]}
-              center
-              distanceFactor={6}
-              transform
-              sprite
-            >
-              <div className="bg-black/80 backdrop-blur-md rounded-xl p-4 max-w-sm border border-cyan-400 shadow-2xl">
-                {/* Holographic scan lines effect */}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-400/20 to-transparent opacity-30 animate-pulse rounded-xl"></div>
-                
-                <div className="relative z-10 space-y-3">
-                  {/* NFT / Minter info (if available) */}
-                  {(item.minter?.username || item.minter?.display_name || item.minter?.pfp_url) && (
-                    <div className="flex items-center space-x-3">
-                      {item.minter?.pfp_url ? (
-                        <img src={item.minter.pfp_url} alt={item.minter?.display_name || item.minter?.username || 'Minter'} className="w-10 h-10 rounded-full border-2 border-cyan-400 shadow-lg" />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-cyan-500/20 border-2 border-cyan-400" />
-                      )}
-                      <div>
-                        <p className="font-semibold text-cyan-300 text-sm">
-                          {item.minter?.display_name || 'Unknown Minter'}
-                        </p>
-                        {item.minter?.username && (
-                          <p className="text-cyan-500 text-xs">@{item.minter.username}</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Content */}
-                  <div className="space-y-2">
-                    {item.title && (
-                      <p className="text-white text-sm font-semibold">{item.title}</p>
-                    )}
-                    {item.description && (
-                      <p className="text-white/90 text-xs leading-relaxed">{item.description}</p>
-                    )}
-                    
-                    {/* Media preview */}
-                    {item.image && (
-                      <img src={item.image} alt="Collectible preview" className="w-full h-24 object-cover rounded border border-cyan-400/50" />
-                    )}
-                  </div>
-                  
-                  {/* Token and chain */}
-                  <div className="flex flex-wrap gap-2 text-xs text-cyan-300">
-                    {item.tokenId && <span># {item.tokenId}</span>}
-                    {item.chain && <span>• {item.chain}</span>}
-                  </div>
-
-                  {/* Timestamp */}
-                  <div className="text-gray-400 text-xs">
-                    {item.timestamp ? new Date(item.timestamp).toLocaleDateString() : ''}
-                  </div>
-                </div>
-              </div>
-            </Html>
-
-            {/* Holographic Particle Effects */}
-            <group>
-              {Array.from({ length: 20 }, (_, i) => (
-                <Float key={i} speed={1 + i * 0.1} rotationIntensity={1} floatIntensity={2}>
-                  <mesh position={[
-                    (Math.random() - 0.5) * 6,
-                    (Math.random() - 0.5) * 6,
-                    (Math.random() - 0.5) * 2
-                  ]}>
-                    <sphereGeometry args={[0.02]} />
-                    <meshStandardMaterial 
-                      color="#00ffff"
-                      emissive="#00ffff"
-                      emissiveIntensity={0.8}
-                      transparent
-                      opacity={0.6}
-                    />
-                  </mesh>
-                </Float>
-              ))}
-            </group>
-          </Float>
-        </group>
-      )}
     </group>
   );
 }
@@ -463,8 +436,9 @@ export function UniverseScene() {
   const { recentMints, isLoading: isLoadingRecent } = useRecentMintEvents();
   const { userNFTs, isLoadingUserNFTs } = useContractNFTs();
 
-  const [hoveredSpaceship, setHoveredSpaceship] = useState<string | null>(null);
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [showModal, setShowModal] = useState(false);
 
   type SpaceItem = {
     id: string;
@@ -506,16 +480,29 @@ export function UniverseScene() {
 
   const currentItems = selectedPath === 'recent' ? recentItems : userItems;
 
-  // Handle spaceship click
-  const handleSpaceshipClick = (id: string) => {
-    setSelectedItemId((prev) => (prev === id ? null : id));
+  // Handle card click
+  const handleCardClick = (id: string) => {
+    const item = currentItems.find(item => item.id === id);
+    if (item) {
+      setSelectedItem(item);
+      setShowModal(true);
+    }
   };
 
-  // Generate spaceship positions in a 3D spiral around the universe
-  const getSpaceshipPosition = (index: number): [number, number, number] => {
-    const radius = 30 + index * 8;
-    const angle = index * 0.8;
-    const height = Math.sin(index * 0.3) * 20;
+  // Handle see more click
+  const handleSeeMoreClick = (id: string) => {
+    const item = currentItems.find(item => item.id === id);
+    if (item) {
+      setSelectedItem(item);
+      setShowModal(true);
+    }
+  };
+
+  // Generate card positions in a 3D spiral around the universe
+  const getCardPosition = (index: number): [number, number, number] => {
+    const radius = 25 + index * 6;
+    const angle = index * 0.6;
+    const height = Math.sin(index * 0.4) * 15;
     
     return [
       Math.cos(angle) * radius,
@@ -548,14 +535,14 @@ export function UniverseScene() {
         <color attach="background" args={['#000008']} />
         <UniverseEnvironment />
         
-        {/* Spaceship Collectibles */}
+        {/* NFT Card Collectibles */}
         {currentItems.map((item, index) => (
-          <Spaceship
+          <NFTCard
             key={item.id}
             item={item}
-            position={getSpaceshipPosition(index)}
-            onSpaceshipClick={handleSpaceshipClick}
-            showHologram={selectedItemId === item.id}
+            position={getCardPosition(index)}
+            onCardClick={handleCardClick}
+            onSeeMoreClick={handleSeeMoreClick}
           />
         ))}
 
@@ -575,14 +562,14 @@ export function UniverseScene() {
             <span>🔍 Scroll to zoom</span>
             <span>⌨️ WASD/Arrows to fly</span>
             <span>Q/E for up/down</span>
-            <span> Click spaceships</span>
+            <span>🃏 Click NFT cards</span>
             <span>Right-click + drag to pan</span>
           </div>
-          <div className="md:hiddengrid grid-cols-2 gap-x-8 gap-y-1 text-xs text-gray-300">
-            🛸Touch spaceships to view collectibles
+          <div className="md:hidden grid grid-cols-1 gap-x-8 gap-y-1 text-xs text-gray-300">
+            🃏 Touch NFT cards to view collectibles
           </div>
           <p className="text-xs text-cyan-400">
-            {currentItems.length} spaceships discovered in {selectedPath === 'recent' ? 'recent space' : 'your fleet'}
+            {currentItems.length} NFT cards discovered in {selectedPath === 'recent' ? 'recent space' : 'your fleet'}
           </p>
         </div>
       </div>
@@ -596,9 +583,19 @@ export function UniverseScene() {
           Exploring collectibles in the vast universe
         </p>
         <div className="text-xs text-cyan-400 mt-2">
-          {hoveredSpaceship ? `Scanning: ${hoveredSpaceship}` : 'Navigate to discover'}
+          {hoveredCard ? `Scanning: ${hoveredCard}` : 'Navigate to discover'}
         </div>
       </div>
+
+      {/* Collectible Modal */}
+      <CollectibleModal
+        item={selectedItem}
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false);
+          setSelectedItem(null);
+        }}
+      />
     </div>
   );
 }
