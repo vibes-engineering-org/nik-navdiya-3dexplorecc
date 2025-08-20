@@ -6,7 +6,7 @@ export const fetchFarcasteUserByFid = async (fid: string): Promise<FarcasterUser
       console.warn('No Neynar API key found');
       return null;
     }
-    const url = `https://api.neynar.com/v2/farcaster/user/${fid}`;
+    const url = `https://api.neynar.com/v2/farcaster/user/bulk/?fids=${fid}`;
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -19,7 +19,7 @@ export const fetchFarcasteUserByFid = async (fid: string): Promise<FarcasterUser
       return null;
     }
     const data = await response.json();
-    return data;  
+    return data.users[0];  
 }
 
 
@@ -77,7 +77,7 @@ export const fetchFarcasterUserByUsername = async (username: string): Promise<Fa
       console.warn('No Neynar API key found');
       return null;
     }
-    const url = `https://api.neynar.com/v2/farcaster/user/by-username?username=${username}`;
+    const url = `https://api.neynar.com/v2/farcaster/user/by_username/?username=${username}`;
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -90,5 +90,5 @@ export const fetchFarcasterUserByUsername = async (username: string): Promise<Fa
       return null;
     }
     const data = await response.json();
-    return data;
+    return data.user;
 }

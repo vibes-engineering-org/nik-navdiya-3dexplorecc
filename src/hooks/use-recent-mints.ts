@@ -103,21 +103,8 @@ export function useRecentMintEvents(): UseRecentMintEventsReturn {
       }
 
       const data = await response.json();
+      return data;
       
-      // The response is an object with addresses as keys
-      for (const [addr, userList] of Object.entries(data)) {
-        if (addr.toLowerCase() === address.toLowerCase() && Array.isArray(userList) && userList.length > 0) {
-          const user = userList[0] as any;
-          return {
-            fid: user.fid,
-            username: user.username,
-            display_name: user.display_name,
-            pfp_url: user.pfp_url,
-          };
-        }
-      }
-
-      return null;
     } catch (error) {
       console.warn(`Error fetching Farcaster user for address ${address}:`, error);
       return null;
