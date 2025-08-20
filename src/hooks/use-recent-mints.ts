@@ -65,6 +65,7 @@ export function useRecentMintEvents(): UseRecentMintEventsReturn {
   // Initialize Alchemy SDK
   const getAlchemy = () => {
     const apiKey = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
+    console.log('Alchemy:', apiKey);
     if (!apiKey) {
       throw new Error('NEXT_PUBLIC_ALCHEMY_KEY is not configured');
     }
@@ -95,7 +96,7 @@ export function useRecentMintEvents(): UseRecentMintEventsReturn {
         console.warn('No Neynar API key found');
         return null;
       }
-
+      console.log('Fetching Farcaster user by address:', apiKey);
       const url = `https://api.neynar.com/v2/farcaster/user/bulk-by-address?addresses=${encodeURIComponent(address)}`;
 
       const response = await fetch(url, {

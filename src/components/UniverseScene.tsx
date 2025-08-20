@@ -566,7 +566,7 @@ export function UniverseScene() {
             <span>Right-click + drag to pan</span>
           </div>
           <div className="md:hidden grid grid-cols-1 gap-x-8 gap-y-1 text-xs text-gray-300">
-            🃏 Touch NFT cards to view collectibles
+            {isLoadingRecent || isLoadingUserNFTs ? 'Loading...' : '🃏 Touch NFT cards to view collectibles'}
           </div>
           <p className="text-xs text-cyan-400">
             {currentItems.length} NFT cards discovered in {selectedPath === 'recent' ? 'recent space' : 'your fleet'}
