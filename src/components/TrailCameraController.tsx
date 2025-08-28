@@ -15,7 +15,7 @@ export function TrailCameraController({ collectiblePositions, isTrailMode }: Tra
   const { trailProgress, setTrailProgress } = useCollectiblesStore();
   const lookAhead = 0.04; // look further ahead so next card stays in view
   const desiredDistanceFromCard = 11; // closer to card
-  const desiredHeightAboveCard = 5; // slightly lower to cards
+  const desiredHeightAboveCard = 100; // slightly lower to cards
   
   const [keys, setKeys] = React.useState<{[key: string]: boolean}>({});
   const trailCurve = useRef<THREE.CatmullRomCurve3 | null>(null);

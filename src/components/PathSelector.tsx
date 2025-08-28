@@ -129,17 +129,7 @@ export function PathSelector({ onPathSelected }: PathSelectorProps) {
               </p>
 
               {/* Stats */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="flex -space-x-1">
-                    <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full border-2 border-white"></div>
-                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full border-2 border-white"></div>
-                    <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full border-2 border-white"></div>
-                  </div>
-                  <span className="text-slate-400 font-medium">Active explorers</span>
-                </div>
-                <div className="text-cyan-400 font-bold">∞ discoveries</div>
-              </div>
+              
 
               {/* Selection indicator */}
               {selectedPath === 'recent' && (
@@ -199,18 +189,7 @@ export function PathSelector({ onPathSelected }: PathSelectorProps) {
                 Revisit your favorite cosmic moments and digital artifacts.
               </p>
 
-              {/* Stats */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="flex -space-x-1">
-                    <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full border-2 border-white"></div>
-                    <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-red-500 rounded-full border-2 border-white"></div>
-                    <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-orange-500 rounded-full border-2 border-white"></div>
-                  </div>
-                  <span className="text-slate-400 font-medium">Your assets</span>
-                </div>
-                <div className="text-purple-400 font-bold">∞ treasures</div>
-              </div>
+              
 
               {/* Selection indicator */}
               {selectedPath === 'mycollection' && (

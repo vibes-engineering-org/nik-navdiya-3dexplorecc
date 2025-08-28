@@ -58,8 +58,8 @@ function NFTCard({
   // Get preview text (first few words)
   const getPreviewText = (text: string | undefined) => {
     if (!text) return "No description available";
-    const words = text.split(' ');
-    return words.length > 8 ? words.slice(0, 8).join(' ') + '...' : text;
+    
+    return text.length > 8 ? text.slice(0, 30) + '...' : text;
   };
 
   return (
@@ -153,7 +153,10 @@ function NFTCard({
             transform
             sprite
           >
-            <div className="w-80 h-96 bg-gradient-to-br from-gray-900/95 to-blue-900/95 backdrop-blur-md rounded-xl p-6 border border-blue-400/50 shadow-2xl">
+            <div className="w-80 h-96 bg-gradient-to-br from-gray-900/95 to-blue-900/95 backdrop-blur-md rounded-xl p-6 border border-blue-400/50 shadow-2xl" onClick={() => {
+                
+                    onSeeMoreClick(item.id);
+            }}>
               {/* Header with PFP and username */}
               <div className="flex items-center space-x-3 mb-4">
                 {item.auther?.pfp_url ? (
@@ -504,7 +507,6 @@ export function UniverseScene({ setCurrentView, logoSrc }: { setCurrentView: Rea
   }, [userNFTs, username, displayName, pfpUrl, fid]);
 
   const currentItems = selectedPath === 'recent' ? recentItems : userItems;
-  console.log(currentItems);
   // Get positions for trail
   const collectiblePositions = useMemo(() => {
     return currentItems.map((_, index) => getCardPosition(index));
