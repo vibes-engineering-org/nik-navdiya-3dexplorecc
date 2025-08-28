@@ -2,6 +2,7 @@
 
 import React, { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { Line } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface TrailLineProps {
@@ -11,8 +12,8 @@ interface TrailLineProps {
 }
 
 export function TrailLine({ positions, isVisible, progress }: TrailLineProps) {
-  const lineRef = useRef<THREE.Line>(null);
-  const glowLineRef = useRef<THREE.Line>(null);
+  const lineRef = useRef<any>(null);
+  const glowLineRef = useRef<any>(null);
   
   // Create the trail path geometry
   const { geometry, totalLength, progressLength } = useMemo(() => {
@@ -87,51 +88,61 @@ export function TrailLine({ positions, isVisible, progress }: TrailLineProps) {
     }
   });
 
-  if (!isVisible || !geometry) return null;
+  if (!geometry || !isVisible) return null;
 
   return (
     <group>
       {/* Main trail line (full path) */}
-      <line ref={lineRef as any} >
-        <lineBasicMaterial 
-          color="#00ffff" 
-          transparent
-          opacity={0.3}
-          linewidth={2}
-        />
-      </line>
+      <Line
+        ref={lineRef}
+        points={geometry ? Array.from(geometry.attributes.position.array).reduce((acc: THREE.Vector3[], val: number, i: number) => {
+          if (i % 3 === 0) acc.push(new THREE.Vector3(val, geometry.attributes.position.array[i + 1], geometry.attributes.position.array[i + 2]));
+          return acc;
+        }, []) : []}
+        color="#00ffff"
+        transparent
+        opacity={0.3}
+        lineWidth={2}
+      />
       
       {/* Glow effect for main trail */}
-      <line ref={glowLineRef as any}>
-        <lineBasicMaterial 
-          color="#00aaff" 
-          transparent
-          opacity={0.1}
-          linewidth={4}
-        />
-      </line>
+      <Line
+        ref={glowLineRef}
+        points={geometry ? Array.from(geometry.attributes.position.array).reduce((acc: THREE.Vector3[], val: number, i: number) => {
+          if (i % 3 === 0) acc.push(new THREE.Vector3(val, geometry.attributes.position.array[i + 1], geometry.attributes.position.array[i + 2]));
+          return acc;
+        }, []) : []}
+        color="#00aaff"
+        transparent
+        opacity={0.1}
+        lineWidth={4}
+      />
       
       {/* Progress line (walked path) */}
       {progressGeometry && progress > 0 && (
         <>
-          <line >
-            <lineBasicMaterial 
-              color="#00ff00" 
-              transparent
-              opacity={0.8}
-              linewidth={3}
-            />
-          </line>
+          <Line
+            points={Array.from(progressGeometry.attributes.position.array).reduce((acc: THREE.Vector3[], val: number, i: number) => {
+              if (i % 3 === 0) acc.push(new THREE.Vector3(val, progressGeometry.attributes.position.array[i + 1], progressGeometry.attributes.position.array[i + 2]));
+              return acc;
+            }, [])}
+            color="#00ff00"
+            transparent
+            opacity={0.8}
+            lineWidth={3}
+          />
           
           {/* Glow for progress line */}
-          <line >
-            <lineBasicMaterial 
-              color="#88ff88" 
-              transparent
-              opacity={0.4}
-              linewidth={6}
-            />
-          </line>
+          <Line
+            points={Array.from(progressGeometry.attributes.position.array).reduce((acc: THREE.Vector3[], val: number, i: number) => {
+              if (i % 3 === 0) acc.push(new THREE.Vector3(val, progressGeometry.attributes.position.array[i + 1], progressGeometry.attributes.position.array[i + 2]));
+              return acc;
+            }, [])}
+            color="#88ff88"
+            transparent
+            opacity={0.4}
+            lineWidth={6}
+          />
         </>
       )}
       

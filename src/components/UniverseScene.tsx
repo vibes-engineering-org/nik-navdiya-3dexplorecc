@@ -302,7 +302,7 @@ function NebulaCloud({ position, color }: {
 }
 
 // Universe Environment Component
-function UniverseEnvironment() {
+function UniverseEnvironment({ logoSrc }: { logoSrc?: string }) {
   return (
     <group>
       {/* Background Stars */}
@@ -323,6 +323,8 @@ function UniverseEnvironment() {
       <Planet position={[-80, 40, 20]} size={2} color="#f7dc6f" rotationSpeed={0.012} />
       <Planet position={[100, -30, 60]} size={3.5} color="#bb8fce" rotationSpeed={0.006} />
       <Planet position={[-60, 80, -40]} size={1.8} color="#82e0aa" rotationSpeed={0.015} />
+      <Planet position={[-100, 100, -100]} size={1.8} color="#e96ee1" rotationSpeed={0.015} />
+      <Planet position={[-50, 10, 100]} size={1.8} color="#8e1dd4" rotationSpeed={0.015} />
 
       {/* Nebula Clouds */}
       <NebulaCloud position={[0, 0, -100]} color="#ff00ff" />
@@ -344,17 +346,24 @@ function UniverseEnvironment() {
         </mesh>
       </Float>
 
-      {/* Central Star/Sun */}
-      <Float speed={0.3} rotationIntensity={0.1} floatIntensity={0.2}>
-        <mesh position={[0, 0, 0]}>
-          <sphereGeometry args={[8, 32, 32]} />
-          <meshStandardMaterial 
-            color="#ffaa00"
-            emissive="#ff6600"
-            emissiveIntensity={0.8}
+      
+
+      {/* Logo Overlay */}
+      {logoSrc && (
+        <Html
+          position={[0, 0, 0.1]}
+          center
+          distanceFactor={10}
+          transform
+          sprite
+        >
+          <img 
+            src={logoSrc} 
+            alt="Logo" 
+            className="w-60 h-60 opacity-70"
           />
-        </mesh>
-      </Float>
+        </Html>
+      )}
     </group>
   );
 }
@@ -430,7 +439,7 @@ function SpaceExplorationCamera() {
 }
 
 // Main Universe Scene Component
-export function UniverseScene({ setCurrentView }: { setCurrentView: React.Dispatch<React.SetStateAction<'selector' | 'explorer'>> }) {
+export function UniverseScene({ setCurrentView, logoSrc }: { setCurrentView: React.Dispatch<React.SetStateAction<'selector' | 'explorer'>>, logoSrc?: string }) {
   const { 
     selectedPath, 
     isTrailMode, 
@@ -495,7 +504,7 @@ export function UniverseScene({ setCurrentView }: { setCurrentView: React.Dispat
   }, [userNFTs, username, displayName, pfpUrl, fid]);
 
   const currentItems = selectedPath === 'recent' ? recentItems : userItems;
-
+  console.log(currentItems);
   // Get positions for trail
   const collectiblePositions = useMemo(() => {
     return currentItems.map((_, index) => getCardPosition(index));
@@ -630,12 +639,32 @@ export function UniverseScene({ setCurrentView }: { setCurrentView: React.Dispat
 
         {/* Space Environment */}
         <color attach="background" args={['#000008']} />
-        <UniverseEnvironment />
+        <UniverseEnvironment logoSrc={logoSrc} />
+        
+        {/* Floating Space Debris */}
+        {Array.from({ length: 50 }, (_, i) => (
+          <Float key={i} speed={0.1 + Math.random() * 0.2} rotationIntensity={0.5} floatIntensity={0.3}>
+            <mesh position={[
+              (Math.random() - 0.5) * 200,
+              (Math.random() - 0.5) * 200,
+              (Math.random() - 0.5) * 200
+            ]}>
+              <boxGeometry args={[0.1, 0.1, 0.1]} />
+              <meshStandardMaterial 
+                color="#666666"
+                transparent
+                opacity={0.3}
+                emissive="#333333"
+                emissiveIntensity={0.1}
+              />
+            </mesh>
+          </Float>
+        ))}
         
         {/* NFT Card Collectibles */}
         {currentItems.map((item, index) => (
           <NFTCard
-            key={item.id}
+            key={item.id + index}
             item={item}
             position={getCardPosition(index)}
             onCardClick={handleCardClick}
@@ -665,7 +694,7 @@ export function UniverseScene({ setCurrentView }: { setCurrentView: React.Dispat
       </Canvas>
 
       {/* UI Controls */}
-      <div className="absolute bottom-36 left-1/2 transform -translate-x-1/2 bg-black/70 text-white p-4 rounded-lg backdrop-blur-sm border border-cyan-400/50 z-10">
+      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black/70 text-white p-4 rounded-lg backdrop-blur-sm border border-cyan-400/50 z-10">
         <div className="text-center space-y-3">
           <div className="flex items-center justify-center space-x-4">
             <p className="text-sm text-cyan-300">
@@ -724,12 +753,7 @@ export function UniverseScene({ setCurrentView }: { setCurrentView: React.Dispat
                   >
                     ◀ Back
                   </button>
-                  <button
-                    className={`${isAutoTrail ? 'bg-green-700/40 text-green-200 border-green-400/50' : 'bg-gray-700/40 text-gray-200 border-gray-500/50'} px-3 py-1 rounded-lg border text-xs`}
-                    onClick={() => setIsAutoTrail((v) => !v)}
-                  >
-                    {isAutoTrail ? '⏸ Pause' : '▶ Auto Walk'}
-                  </button>
+                  
                   <button
                     className="px-3 py-1 rounded-lg bg-green-600/30 text-green-300 border border-green-400/50"
                     onClick={() => goToIndex(currentWaypoint + 1)}

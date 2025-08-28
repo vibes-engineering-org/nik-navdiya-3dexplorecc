@@ -6,10 +6,17 @@ import { PathSelector } from './PathSelector';
 import { Scene3D } from './Scene3D';
 import { useMiniAppSdk } from '~/hooks/useMiniAppSdk';
 
-export function CollectibleExplorer() {
+export function CollectibleExplorer({ logoSrc }: { logoSrc?: string }) {
   const [currentView, setCurrentView] = useState<'selector' | 'explorer'>('selector');
   const { context, isSDKLoaded } = useMiniAppSdk();
-  const { selectedPath } = useCollectiblesStore();
+  
+  const {
+    selectedPath,
+    setRecentCollectibles,
+    setMyCollectibles,
+    setIsLoading,
+    loadMoreCollectibles
+  } = useCollectiblesStore();
 
   // Switch to explorer when a path is selected (data is provided by hooks)
   const handlePathSelected = async () => {
@@ -31,7 +38,9 @@ export function CollectibleExplorer() {
         </div>
       ) : (
         <div className="relative">
-          <Scene3D setCurrentView={setCurrentView} />
+          <Scene3D setCurrentView={setCurrentView} logoSrc={logoSrc} />
+          
+          {/* Back to path selector button */}
           
         </div>
       )}
