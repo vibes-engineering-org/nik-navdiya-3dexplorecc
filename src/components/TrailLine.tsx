@@ -92,7 +92,7 @@ export function TrailLine({ positions, isVisible, progress }: TrailLineProps) {
   return (
     <group>
       {/* Main trail line (full path) */}
-      <line ref={lineRef} geometry={geometry}>
+      <line ref={lineRef as any} >
         <lineBasicMaterial 
           color="#00ffff" 
           transparent
@@ -102,7 +102,7 @@ export function TrailLine({ positions, isVisible, progress }: TrailLineProps) {
       </line>
       
       {/* Glow effect for main trail */}
-      <line ref={glowLineRef} geometry={geometry}>
+      <line ref={glowLineRef as any}>
         <lineBasicMaterial 
           color="#00aaff" 
           transparent
@@ -114,7 +114,7 @@ export function TrailLine({ positions, isVisible, progress }: TrailLineProps) {
       {/* Progress line (walked path) */}
       {progressGeometry && progress > 0 && (
         <>
-          <line geometry={progressGeometry}>
+          <line >
             <lineBasicMaterial 
               color="#00ff00" 
               transparent
@@ -124,7 +124,7 @@ export function TrailLine({ positions, isVisible, progress }: TrailLineProps) {
           </line>
           
           {/* Glow for progress line */}
-          <line geometry={progressGeometry}>
+          <line >
             <lineBasicMaterial 
               color="#88ff88" 
               transparent

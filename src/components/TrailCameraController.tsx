@@ -81,7 +81,9 @@ export function TrailCameraController({ collectiblePositions, isTrailMode }: Tra
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault();
       const delta = event.deltaY > 0 ? 0.01 : -0.01;
-      setTrailProgress(prev => Math.max(0, Math.min(1, prev + delta)));
+    
+
+      setTrailProgress(Math.max(0, Math.min(1, trailProgress + delta)));
     };
 
     window.addEventListener('wheel', handleWheel, { passive: false });

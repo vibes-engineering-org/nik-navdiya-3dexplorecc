@@ -525,10 +525,9 @@ export function UniverseScene({ setCurrentView }: { setCurrentView: React.Dispat
       if (lastTs === 0) lastTs = ts;
       const dt = (ts - lastTs) / 1000;
       lastTs = ts;
-      setTrailProgress((p) => {
-        const np = Math.min(1, p + speedPerSec * dt);
-        return np;
-      });
+      setTrailProgress(
+        Math.min(1, trailProgress + speedPerSec * dt)
+        );
       if (isTrailMode && isAutoTrail) rafId = requestAnimationFrame(step);
     };
     if (isTrailMode && isAutoTrail) rafId = requestAnimationFrame(step);
