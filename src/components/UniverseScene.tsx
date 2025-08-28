@@ -20,6 +20,8 @@ import { useRecentMintEvents } from '~/hooks/use-recent-mints';
 import { useContractNFTs } from '~/hooks/use-contract-nfts';
 import { CollectibleModal } from './CollectibleModal';
 import { useProfile } from '~/hooks/use-profile';
+import { TrailLine } from './TrailLine';
+import { TrailCameraController } from './TrailCameraController';
 
 // 3D NFT Card Component representing collectible casts
 function NFTCard({ 
@@ -429,7 +431,13 @@ function SpaceExplorationCamera() {
 
 // Main Universe Scene Component
 export function UniverseScene({ setCurrentView }: { setCurrentView: React.Dispatch<React.SetStateAction<'selector' | 'explorer'>> }) {
-  const { selectedPath } = useCollectiblesStore();
+  const { 
+    selectedPath, 
+    isTrailMode, 
+    trailProgress, 
+    setIsTrailMode, 
+    setTrailProgress 
+  } = useCollectiblesStore();
   const { recentMints, isLoading: isLoadingRecent } = useRecentMintEvents();
   const { userNFTs, isLoadingUserNFTs } = useContractNFTs();
   const { username, displayName, pfpUrl, fid } = useProfile();
@@ -438,6 +446,9 @@ export function UniverseScene({ setCurrentView }: { setCurrentView: React.Dispat
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
+  const [isAutoTrail, setIsAutoTrail] = useState(false);
+  const [currentWaypoint, setCurrentWaypoint] = useState(0);
+  const animRef = useRef<number | null>(null);
 
   type SpaceItem = {
     id: string;
@@ -481,9 +492,90 @@ export function UniverseScene({ setCurrentView }: { setCurrentView: React.Dispat
       minter: { username, display_name: displayName, pfp_url:pfpUrl, fid },
       auther: n.auther || null,
     }));
-  }, [userNFTs]);
+  }, [userNFTs, username, displayName, pfpUrl, fid]);
 
   const currentItems = selectedPath === 'recent' ? recentItems : userItems;
+
+  // Get positions for trail
+  const collectiblePositions = useMemo(() => {
+    return currentItems.map((_, index) => getCardPosition(index));
+  }, [currentItems]);
+
+  // Handle trail toggle
+  const handleTrailToggle = () => {
+    if (isTrailMode) {
+      setIsTrailMode(false);
+      setTrailProgress(0);
+      setIsAutoTrail(false);
+      setCurrentWaypoint(0);
+    } else {
+      setIsTrailMode(true);
+      setTrailProgress(0);
+      setCurrentWaypoint(0);
+    }
+  };
+
+  // Auto-advance along trail for mobile
+  useEffect(() => {
+    let rafId: number;
+    let lastTs = 0;
+    const speedPerSec = 0.12; // fraction per second
+    const step = (ts: number) => {
+      if (!isTrailMode || !isAutoTrail) return;
+      if (lastTs === 0) lastTs = ts;
+      const dt = (ts - lastTs) / 1000;
+      lastTs = ts;
+      setTrailProgress((p) => {
+        const np = Math.min(1, p + speedPerSec * dt);
+        return np;
+      });
+      if (isTrailMode && isAutoTrail) rafId = requestAnimationFrame(step);
+    };
+    if (isTrailMode && isAutoTrail) rafId = requestAnimationFrame(step);
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, [isTrailMode, isAutoTrail, setTrailProgress]);
+
+  // Smoothly animate to a specific collectible index along the trail
+  const goToIndex = (targetIndex: number) => {
+    if (!isTrailMode || currentItems.length === 0) return;
+    const maxIndex = Math.max(0, currentItems.length - 1);
+    const clamped = Math.min(maxIndex, Math.max(0, targetIndex));
+    const targetProgress = maxIndex === 0 ? 0 : clamped / maxIndex;
+
+    if (animRef.current) cancelAnimationFrame(animRef.current);
+
+    const durationMs = 650;
+    const start = performance.now();
+    const startProgress = trailProgress;
+    const delta = targetProgress - startProgress;
+
+    const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
+
+    const step = (ts: number) => {
+      const elapsed = ts - start;
+      const t = Math.min(1, elapsed / durationMs);
+      const eased = easeInOut(t);
+      setTrailProgress(startProgress + delta * eased);
+      if (t < 1) {
+        animRef.current = requestAnimationFrame(step);
+      } else {
+        setCurrentWaypoint(clamped);
+        animRef.current = null;
+      }
+    };
+
+    animRef.current = requestAnimationFrame(step);
+  };
+
+  // Keep currentWaypoint roughly in sync during auto-walk/manual changes
+  useEffect(() => {
+    if (currentItems.length === 0) return;
+    const maxIndex = Math.max(0, currentItems.length - 1);
+    const approxIndex = Math.round(trailProgress * maxIndex);
+    setCurrentWaypoint(Math.min(maxIndex, Math.max(0, approxIndex)));
+  }, [trailProgress, currentItems.length]);
 
   // Handle card click
   const handleCardClick = (id: string) => {
@@ -504,17 +596,17 @@ export function UniverseScene({ setCurrentView }: { setCurrentView: React.Dispat
   };
 
   // Generate card positions in a 3D spiral around the universe
-  const getCardPosition = (index: number): [number, number, number] => {
+  function getCardPosition(index: number): [number, number, number] {
     const radius = 25 + index * 6;
     const angle = index * 0.6;
-    const height = Math.sin(index * 0.4) * 15;
-    
+    const height = Math.sin(index * 0.4) * 6; // reduced vertical spread
+
     return [
       Math.cos(angle) * radius,
       height,
       Math.sin(angle) * radius
     ];
-  };
+  }
 
   return (
     <div className="w-full h-screen relative">
@@ -552,27 +644,104 @@ export function UniverseScene({ setCurrentView }: { setCurrentView: React.Dispat
           />
         ))}
 
-        {/* Space Exploration Camera Controls */}
-        <SpaceExplorationCamera />
+        {/* Trail Line */}
+        <TrailLine 
+          positions={collectiblePositions}
+          isVisible={isTrailMode}
+          progress={trailProgress}
+        />
+
+        {/* Camera Controls */}
+        {isTrailMode ? (
+          <TrailCameraController 
+            collectiblePositions={collectiblePositions}
+            isTrailMode={isTrailMode}
+          />
+        ) : (
+          <SpaceExplorationCamera />
+        )}
 
         {/* Space Fog for depth */}
         <fog attach="fog" args={['#000020', 50, 300]} />
       </Canvas>
 
       {/* UI Controls */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black/70 text-white p-4 rounded-lg backdrop-blur-sm border border-cyan-400/50 z-10">
-        <div className="text-center space-y-2">
-          <p className="text-sm text-cyan-300">🚀 Exploring the Universe</p>
+      <div className="absolute bottom-36 left-1/2 transform -translate-x-1/2 bg-black/70 text-white p-4 rounded-lg backdrop-blur-sm border border-cyan-400/50 z-10">
+        <div className="text-center space-y-3">
+          <div className="flex items-center justify-center space-x-4">
+            <p className="text-sm text-cyan-300">
+              {isTrailMode ? '🚶‍♂️ Walking on Trail' : '🚀 Free Exploration'}
+            </p>
+            
+            {/* Trail Toggle Button */}
+            <button
+              onClick={handleTrailToggle}
+              className={`px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 ${
+                isTrailMode 
+                  ? 'bg-green-600/30 text-green-300 border border-green-400/50 hover:bg-green-600/50' 
+                  : 'bg-cyan-600/30 text-cyan-300 border border-cyan-400/50 hover:bg-cyan-600/50'
+              }`}
+            >
+              {isTrailMode ? 'Exit Trail' : 'Walk on Trail'}
+            </button>
+          </div>
+          
+          {/* Trail Progress */}
+          {isTrailMode && (
+            <div className="text-xs text-green-300">
+              Trail Progress: {Math.round(trailProgress * 100)}% 
+              <span className="text-gray-400 ml-2">
+                ({Math.floor(trailProgress * currentItems.length) + 1}/{currentItems.length})
+              </span>
+            </div>
+          )}
+          
           <div className="grid-cols-2 gap-x-8 gap-y-1 text-xs hidden md:grid text-gray-300">
-            <span>🖱️ Drag to rotate</span>
-            <span>🔍 Scroll to zoom</span>
-            <span>⌨️ WASD/Arrows to fly</span>
-            <span>Q/E for up/down</span>
-            <span>🃏 Click NFT cards</span>
-            <span>Right-click + drag to pan</span>
+            {isTrailMode ? (
+              <>
+                <span>⌨️ W/↑ Move forward</span>
+                <span>⌨️ S/↓ Move backward</span>
+                <span>🔍 Scroll to navigate</span>
+                <span>🃏 Click NFT cards</span>
+              </>
+            ) : (
+              <>
+                <span>🖱️ Drag to rotate</span>
+                <span>🔍 Scroll to zoom</span>
+                <span>⌨️ WASD/Arrows to fly</span>
+                <span>Q/E for up/down</span>
+                <span>🃏 Click NFT cards</span>
+                <span>Right-click + drag to pan</span>
+              </>
+            )}
           </div>
           <div className="md:hidden grid grid-cols-1 gap-x-8 gap-y-1 text-xs text-gray-300">
-            {isLoadingRecent || isLoadingUserNFTs ? 'Loading...' : '🃏 Touch NFT cards to view collectibles'}
+            {isLoadingRecent || isLoadingUserNFTs ? 'Loading...' : (
+              isTrailMode ? (
+                <div className="flex items-center justify-center space-x-3">
+                  <button
+                    className="px-3 py-1 rounded-lg bg-green-600/30 text-green-300 border border-green-400/50"
+                    onClick={() => goToIndex(currentWaypoint - 1)}
+                  >
+                    ◀ Back
+                  </button>
+                  <button
+                    className={`${isAutoTrail ? 'bg-green-700/40 text-green-200 border-green-400/50' : 'bg-gray-700/40 text-gray-200 border-gray-500/50'} px-3 py-1 rounded-lg border text-xs`}
+                    onClick={() => setIsAutoTrail((v) => !v)}
+                  >
+                    {isAutoTrail ? '⏸ Pause' : '▶ Auto Walk'}
+                  </button>
+                  <button
+                    className="px-3 py-1 rounded-lg bg-green-600/30 text-green-300 border border-green-400/50"
+                    onClick={() => goToIndex(currentWaypoint + 1)}
+                  >
+                    Next ▶
+                  </button>
+                </div>
+              ) : (
+                '🃏 Touch NFT cards to view collectibles'
+              )
+            )}
           </div>
           <p className="text-xs text-cyan-400">
             {currentItems.length} NFT cards discovered in {selectedPath === 'recent' ? 'recent space' : 'your fleet'}

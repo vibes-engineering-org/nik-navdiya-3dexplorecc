@@ -47,6 +47,10 @@ interface CollectiblesState {
   showHologram: boolean;
   isLoading: boolean;
   hasReachedEnd: boolean;
+  
+  // Trail mode state
+  isTrailMode: boolean;
+  trailProgress: number; // 0 to 1, representing progress along the trail
 }
 
 interface CollectiblesActions {
@@ -58,6 +62,8 @@ interface CollectiblesActions {
   setIsLoading: (loading: boolean) => void;
   setHasReachedEnd: (end: boolean) => void;
   loadMoreCollectibles: () => Promise<void>;
+  setIsTrailMode: (trailMode: boolean) => void;
+  setTrailProgress: (progress: number) => void;
 }
 
 type CollectiblesContextType = CollectiblesState & CollectiblesActions;
@@ -72,6 +78,8 @@ export function CollectiblesProvider({ children }: { children: ReactNode }) {
   const [showHologram, setShowHologram] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [hasReachedEnd, setHasReachedEnd] = useState(false);
+  const [isTrailMode, setIsTrailMode] = useState(false);
+  const [trailProgress, setTrailProgress] = useState(0);
 
 
 
@@ -95,6 +103,8 @@ export function CollectiblesProvider({ children }: { children: ReactNode }) {
     showHologram,
     isLoading,
     hasReachedEnd,
+    isTrailMode,
+    trailProgress,
     setSelectedPath,
     setRecentCollectibles,
     setMyCollectibles,
@@ -102,7 +112,9 @@ export function CollectiblesProvider({ children }: { children: ReactNode }) {
     setShowHologram,
     setIsLoading,
     setHasReachedEnd,
-    loadMoreCollectibles
+    loadMoreCollectibles,
+    setIsTrailMode,
+    setTrailProgress
   };
 
   return (
