@@ -87,7 +87,7 @@ export function PathSelector({ onPathSelected }: PathSelectorProps) {
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-4 md:mb-6 leading-tight">
             <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Universe Explorer
+              Farcaster Collectibles Explorer
             </span>
           </h1>
           <p className="text-lg md:text-xl lg:text-2xl text-slate-300 max-w-3xl mx-auto leading-relaxed px-4">
@@ -116,16 +116,16 @@ export function PathSelector({ onPathSelected }: PathSelectorProps) {
                 <div className="text-4xl">🚀</div>
                 <div>
                   <h2 className="text-2xl font-bold text-white group-hover:text-cyan-300 transition-colors">
-                    Recent Discoveries
+                    Explore Recent 10 FC Cast Collectibles 
                   </h2>
-                  <p className="text-slate-400 text-sm">Latest cosmic findings</p>
+                  <p className="text-slate-400 text-sm">Latest Collectible Cast findings</p>
                 </div>
               </div>
 
               {/* Description */}
               <p className="text-slate-300 text-lg leading-relaxed mb-8">
-                Explore recently discovered spaceships containing the latest collectible casts from across the galaxy. 
-                Discover trending content and emerging creators in the vast universe.
+                Explore recently minted Farcaster Collectibles from across the Farcaster galaxy. 
+                Discover trending content and emerging creators in the vast Farcaster universe.
               </p>
 
               {/* Stats */}
@@ -177,15 +177,15 @@ export function PathSelector({ onPathSelected }: PathSelectorProps) {
                 <div className="text-4xl">🛸</div>
                 <div>
                   <h2 className="text-2xl font-bold text-white group-hover:text-purple-300 transition-colors">
-                    Your Fleet
+                    Explore Your Collection of FC Cast Collectibles
                   </h2>
-                  <p className="text-slate-400 text-sm">Personal collection</p>
+                  <p className="text-slate-400 text-sm">Explore Your minted Casts</p>
                 </div>
               </div>
 
               {/* Description */}
               <p className="text-slate-300 text-lg leading-relaxed mb-8">
-                Navigate to your personal fleet of collected spaceships and explore your NFT treasures. 
+                Navigate to your personal fleet of collected Farcaster Collectibles.
                 Revisit your favorite cosmic moments and digital artifacts.
               </p>
 
@@ -222,12 +222,12 @@ export function PathSelector({ onPathSelected }: PathSelectorProps) {
         {/* Instructions */}
         <div className="text-center mt-12 md:mt-16">
           <p className="text-lg md:text-xl text-slate-400 mb-6">
-            Choose your cosmic journey to begin exploring the universe of collectibles
+            Choose your cosmic journey to begin exploring the universe of  Farcaster collectibles
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 md:gap-8 text-sm text-slate-500">
             <div className="flex items-center gap-2">
               <span className="text-lg">🖱️</span>
-              <span>Drag to explore universe</span>
+              <span>Drag to explore</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-lg">🔍</span>
@@ -239,7 +239,7 @@ export function PathSelector({ onPathSelected }: PathSelectorProps) {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-lg">🛸</span>
-              <span>Click spaceships to discover</span>
+              <span>Click Cards to discover</span>
             </div>
           </div>
         </div>
