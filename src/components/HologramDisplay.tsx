@@ -84,9 +84,15 @@ export function HologramDisplay({ collectible, onClose }: HologramDisplayProps) 
                 />
               </div>
               <div className="min-w-0 flex-1">
-                <h2 className="text-lg sm:text-xl font-bold text-white truncate">{collectible.author.display_name}</h2>
-                <p className="text-cyan-400 text-sm sm:text-base truncate">@{collectible.author.username}</p>
-                <p className="text-xs text-gray-400">FID: {collectible.author.fid}</p>
+                <h2 className="text-lg sm:text-xl font-bold text-white truncate">
+                  {collectible.author.display_name || collectible.author.username || 'Unknown Author'}
+                </h2>
+                {collectible.author.username && (
+                  <p className="text-cyan-400 text-sm sm:text-base truncate">@{collectible.author.username}</p>
+                )}
+                {collectible.author.fid && (
+                  <p className="text-xs text-gray-400">FID: {collectible.author.fid}</p>
+                )}
               </div>
             </div>
 

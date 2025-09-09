@@ -1,49 +1,62 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCollectiblesStore } from '~/store/collectibles';
-import { PathSelector } from './PathSelector';
 import { Scene3D } from './Scene3D';
+import { ViewToggle } from './ViewToggle';
+import { OnboardingTooltip } from './OnboardingTooltip';
 import { useMiniAppSdk } from '~/hooks/useMiniAppSdk';
 
 export function CollectibleExplorer({ logoSrc }: { logoSrc?: string }) {
-  const [currentView, setCurrentView] = useState<'selector' | 'explorer'>('selector');
   const { context, isSDKLoaded } = useMiniAppSdk();
+  const [isViewLoading, setIsViewLoading] = useState(false);
   
   const {
     selectedPath,
+    setSelectedPath,
     setRecentCollectibles,
     setMyCollectibles,
     setIsLoading,
     loadMoreCollectibles
   } = useCollectiblesStore();
 
-  // Switch to explorer when a path is selected (data is provided by hooks)
-  const handlePathSelected = async () => {
-    setCurrentView('explorer');
-  };
+  // Load Scene3D directly on mount with default 'recent' path
+  useEffect(() => {
+    // Set default path to 'recent' if not already set
+    if (selectedPath !== 'recent' && selectedPath !== 'mycollection') {
+      setSelectedPath('recent');
+    }
+  }, [selectedPath, setSelectedPath]);
 
-  // Reset to selector when path changes
-  const handleBackToSelector = () => {
-    setCurrentView('selector');
+  // Handle view change with loading state
+  const handleViewChange = async (newView: 'recent' | 'mycollection') => {
+    if (isViewLoading || newView === selectedPath) return;
+    
+    setIsViewLoading(true);
+    setSelectedPath(newView);
+    
+    // Simulate loading time for smooth UX
+    setTimeout(() => {
+      setIsViewLoading(false);
+    }, 800);
   };
 
   return (
     <div className="w-full min-h-screen overflow-hidden">
-      {currentView === 'selector' ? (
-        <div className="relative">
-          <PathSelector onPathSelected={handlePathSelected} />
-          
-          {/* Back button - hidden on selector view initially */}
-        </div>
-      ) : (
-        <div className="relative">
-          <Scene3D setCurrentView={setCurrentView} logoSrc={logoSrc} />
-          
-          {/* Back to path selector button */}
-          
-        </div>
-      )}
+      <div className="relative">
+        {/* View Toggle - Fixed overlay at top center */}
+        <ViewToggle 
+          activeView={selectedPath}
+          onViewChange={handleViewChange}
+          isLoading={isViewLoading}
+        />
+        
+        {/* Onboarding Tooltip - Shows navigation instructions */}
+        <OnboardingTooltip />
+        
+        {/* 3D Scene - Load immediately */}
+        <Scene3D setCurrentView={() => {}} logoSrc={logoSrc} />
+      </div>
     </div>
   );
 }

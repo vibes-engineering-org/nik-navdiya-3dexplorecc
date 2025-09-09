@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { useRef, useEffect, useState, useMemo } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { 
-  OrbitControls, 
+import React, { useRef, useEffect, useState, useMemo } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import {
+  OrbitControls,
   Stars,
   Sphere,
   Text,
@@ -12,26 +12,26 @@ import {
   Environment,
   PerspectiveCamera,
   useTexture,
-  KeyboardControls
-} from '@react-three/drei';
-import * as THREE from 'three';
-import { useCollectiblesStore } from '~/store/collectibles';
-import { useRecentMintEvents } from '~/hooks/use-recent-mints';
-import { useContractNFTs } from '~/hooks/use-contract-nfts';
-import { CollectibleModal } from './CollectibleModal';
-import { useProfile } from '~/hooks/use-profile';
-import { TrailLine } from './TrailLine';
-import { TrailCameraController } from './TrailCameraController';
+  KeyboardControls,
+} from "@react-three/drei";
+import * as THREE from "three";
+import { useCollectiblesStore } from "~/store/collectibles";
+import { useRecentMintEvents } from "~/hooks/use-recent-mints";
+import { useContractNFTs } from "~/hooks/use-contract-nfts";
+import { CollectibleModal } from "./CollectibleModal";
+import { useProfile } from "~/hooks/use-profile";
+import { TrailLine } from "./TrailLine";
+import { TrailCameraController } from "./TrailCameraController";
 
 // 3D NFT Card Component representing collectible casts
-function NFTCard({ 
-  item, 
-  position, 
+function NFTCard({
+  item,
+  position,
   onCardClick,
-  onSeeMoreClick
-}: { 
-  item: any; 
-  position: [number, number, number]; 
+  onSeeMoreClick,
+}: {
+  item: any;
+  position: [number, number, number];
   onCardClick: (id: string) => void;
   onSeeMoreClick: (id: string) => void;
 }) {
@@ -41,16 +41,34 @@ function NFTCard({
   useFrame((state) => {
     if (cardRef.current) {
       // Gentle floating animation
-      cardRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.8) * 0.1;
-      cardRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.3) * 0.05;
-      
+      cardRef.current.position.y =
+        position[1] + Math.sin(state.clock.elapsedTime * 0.8) * 0.1;
+      cardRef.current.rotation.y =
+        Math.sin(state.clock.elapsedTime * 0.3) * 0.05;
+
       // Subtle tilt when hovered
       if (hovered) {
-        cardRef.current.rotation.x = THREE.MathUtils.lerp(cardRef.current.rotation.x, 0.1, 0.1);
-        cardRef.current.rotation.z = THREE.MathUtils.lerp(cardRef.current.rotation.z, 0.05, 0.1);
+        cardRef.current.rotation.x = THREE.MathUtils.lerp(
+          cardRef.current.rotation.x,
+          0.1,
+          0.1,
+        );
+        cardRef.current.rotation.z = THREE.MathUtils.lerp(
+          cardRef.current.rotation.z,
+          0.05,
+          0.1,
+        );
       } else {
-        cardRef.current.rotation.x = THREE.MathUtils.lerp(cardRef.current.rotation.x, 0, 0.1);
-        cardRef.current.rotation.z = THREE.MathUtils.lerp(cardRef.current.rotation.z, 0, 0.1);
+        cardRef.current.rotation.x = THREE.MathUtils.lerp(
+          cardRef.current.rotation.x,
+          0,
+          0.1,
+        );
+        cardRef.current.rotation.z = THREE.MathUtils.lerp(
+          cardRef.current.rotation.z,
+          0,
+          0.1,
+        );
       }
     }
   });
@@ -58,8 +76,8 @@ function NFTCard({
   // Get preview text (first few words)
   const getPreviewText = (text: string | undefined) => {
     if (!text) return "No description available";
-    
-    return text.length > 8 ? text.slice(0, 30) + '...' : text;
+
+    return text.length > 8 ? text.slice(0, 30) + "..." : text;
   };
 
   return (
@@ -74,8 +92,8 @@ function NFTCard({
           {/* Card Base */}
           <mesh>
             <boxGeometry args={[4, 5, 0.2]} />
-            <meshStandardMaterial 
-              color={hovered ? "#1a1a2e" : "#16213e"} 
+            <meshStandardMaterial
+              color={hovered ? "#1a1a2e" : "#16213e"}
               metalness={0.1}
               roughness={0.3}
               emissive={hovered ? "#0f3460" : "#000000"}
@@ -86,8 +104,8 @@ function NFTCard({
           {/* Card Border/Frame */}
           <mesh position={[0, 0, 0.11]}>
             <boxGeometry args={[3.8, 4.8, 0.05]} />
-            <meshStandardMaterial 
-              color={hovered ? "#00d4ff" : "#0066cc"} 
+            <meshStandardMaterial
+              color={hovered ? "#00d4ff" : "#0066cc"}
               metalness={0.8}
               roughness={0.2}
               emissive={hovered ? "#0088ff" : "#004488"}
@@ -101,8 +119,8 @@ function NFTCard({
               {/* Top edge */}
               <mesh position={[0, 2.4, 0.12]}>
                 <boxGeometry args={[3.8, 0.05, 0.05]} />
-                <meshStandardMaterial 
-                  color="#00ffff" 
+                <meshStandardMaterial
+                  color="#00ffff"
                   emissive="#00ffff"
                   emissiveIntensity={1}
                   transparent
@@ -112,8 +130,8 @@ function NFTCard({
               {/* Bottom edge */}
               <mesh position={[0, -2.4, 0.12]}>
                 <boxGeometry args={[3.8, 0.05, 0.05]} />
-                <meshStandardMaterial 
-                  color="#00ffff" 
+                <meshStandardMaterial
+                  color="#00ffff"
                   emissive="#00ffff"
                   emissiveIntensity={1}
                   transparent
@@ -123,8 +141,8 @@ function NFTCard({
               {/* Left edge */}
               <mesh position={[-1.9, 0, 0.12]}>
                 <boxGeometry args={[0.05, 4.8, 0.05]} />
-                <meshStandardMaterial 
-                  color="#00ffff" 
+                <meshStandardMaterial
+                  color="#00ffff"
                   emissive="#00ffff"
                   emissiveIntensity={1}
                   transparent
@@ -134,8 +152,8 @@ function NFTCard({
               {/* Right edge */}
               <mesh position={[1.9, 0, 0.12]}>
                 <boxGeometry args={[0.05, 4.8, 0.05]} />
-                <meshStandardMaterial 
-                  color="#00ffff" 
+                <meshStandardMaterial
+                  color="#00ffff"
                   emissive="#00ffff"
                   emissiveIntensity={1}
                   transparent
@@ -153,31 +171,39 @@ function NFTCard({
             transform
             sprite
           >
-            <div className="w-80 h-96 bg-gradient-to-br from-gray-900/95 to-blue-900/95 backdrop-blur-md rounded-xl p-6 border border-blue-400/50 shadow-2xl" onClick={() => {
-                
-                    onSeeMoreClick(item.id);
-            }}>
+            <div
+              className="w-80 h-96 bg-gradient-to-br from-gray-900/95 to-blue-900/95 backdrop-blur-md rounded-xl p-6 border border-blue-400/50 shadow-2xl"
+              onClick={() => {
+                onSeeMoreClick(item.id);
+              }}
+            >
               {/* Header with PFP and username */}
               <div className="flex items-center space-x-3 mb-4">
-                {item.auther?.pfp_url ? (
-                  <img 
-                    src={item.auther.pfp_url} 
-                    alt={item.auther?.display_name || item.auther?.username || 'Auther'} 
+                {item.author?.pfp_url ? (
+                  <img
+                    src={item.author.pfp_url}
+                    alt={
+                      item.author?.display_name ||
+                      item.author?.username ||
+                      "Author"
+                    }
                     className="w-12 h-12 rounded-full border-2 border-blue-400 shadow-lg"
                   />
                 ) : (
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-2 border-blue-400 flex items-center justify-center">
                     <span className="text-blue-300 text-lg font-bold">
-                      {item.auther?.username?.[0]?.toUpperCase() || '?'}
+                      {item.author?.username?.[0]?.toUpperCase() || "?"}
                     </span>
                   </div>
                 )}
                 <div className="flex-1">
                   <p className="font-semibold text-blue-300 text-base">
-                    {item.auther?.display_name || 'Unknown Auther'}
+                    {item.author?.display_name || item.author?.username || "Unknown Author"}
                   </p>
-                  {item.auther?.username && (
-                    <p className="text-blue-400 text-sm">@{item.auther.username}</p>
+                  {item.author?.username && (
+                    <p className="text-blue-400 text-sm">
+                      @{item.author.username}
+                    </p>
                   )}
                 </div>
               </div>
@@ -185,9 +211,9 @@ function NFTCard({
               {/* NFT Image */}
               {item.image && (
                 <div className="mb-4 rounded-lg overflow-hidden border border-blue-400/30">
-                  <img 
-                    src={item.image} 
-                    alt="NFT preview" 
+                  <img
+                    src={item.image}
+                    alt="NFT preview"
                     className="w-full h-32 object-cover"
                   />
                 </div>
@@ -205,7 +231,7 @@ function NFTCard({
                 <p className="text-gray-300 text-sm leading-relaxed">
                   {getPreviewText(item.description)}
                 </p>
-                
+
                 {/* See More Button */}
                 <button
                   onClick={(e) => {
@@ -215,13 +241,21 @@ function NFTCard({
                   className="inline-flex items-center px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 text-sm rounded-lg border border-blue-400/50 transition-all duration-200 hover:border-blue-300"
                 >
                   See More
-                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <svg
+                    className="w-4 h-4 ml-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 </button>
               </div>
-
-              
             </div>
           </Html>
 
@@ -229,14 +263,21 @@ function NFTCard({
           {hovered && (
             <group>
               {Array.from({ length: 12 }, (_, i) => (
-                <Float key={i} speed={2 + i * 0.2} rotationIntensity={1} floatIntensity={2}>
-                  <mesh position={[
-                    (Math.random() - 0.5) * 8,
-                    (Math.random() - 0.5) * 8,
-                    (Math.random() - 0.5) * 3
-                  ]}>
+                <Float
+                  key={i}
+                  speed={2 + i * 0.2}
+                  rotationIntensity={1}
+                  floatIntensity={2}
+                >
+                  <mesh
+                    position={[
+                      (Math.random() - 0.5) * 8,
+                      (Math.random() - 0.5) * 8,
+                      (Math.random() - 0.5) * 3,
+                    ]}
+                  >
                     <sphereGeometry args={[0.03]} />
-                    <meshStandardMaterial 
+                    <meshStandardMaterial
                       color="#00d4ff"
                       emissive="#00d4ff"
                       emissiveIntensity={0.8}
@@ -255,7 +296,12 @@ function NFTCard({
 }
 
 // Planet Component
-function Planet({ position, size, color, rotationSpeed = 0.01 }: {
+function Planet({
+  position,
+  size,
+  color,
+  rotationSpeed = 0.01,
+}: {
   position: [number, number, number];
   size: number;
   color: string;
@@ -273,18 +319,17 @@ function Planet({ position, size, color, rotationSpeed = 0.01 }: {
     <Float speed={0.2} rotationIntensity={0.1} floatIntensity={0.1}>
       <mesh ref={planetRef} position={position}>
         <sphereGeometry args={[size, 32, 32]} />
-        <meshStandardMaterial 
-          color={color}
-          roughness={0.8}
-          metalness={0.1}
-        />
+        <meshStandardMaterial color={color} roughness={0.8} metalness={0.1} />
       </mesh>
     </Float>
   );
 }
 
 // Nebula Cloud Component
-function NebulaCloud({ position, color }: {
+function NebulaCloud({
+  position,
+  color,
+}: {
   position: [number, number, number];
   color: string;
 }) {
@@ -292,7 +337,7 @@ function NebulaCloud({ position, color }: {
     <Float speed={0.1} rotationIntensity={0.05} floatIntensity={0.3}>
       <mesh position={position}>
         <sphereGeometry args={[8, 16, 16]} />
-        <meshStandardMaterial 
+        <meshStandardMaterial
           color={color}
           transparent
           opacity={0.1}
@@ -309,25 +354,65 @@ function UniverseEnvironment({ logoSrc }: { logoSrc?: string }) {
   return (
     <group>
       {/* Background Stars */}
-      <Stars 
-        radius={300} 
-        depth={100} 
-        count={8000} 
-        factor={6} 
-        saturation={0.5} 
+      <Stars
+        radius={300}
+        depth={100}
+        count={8000}
+        factor={6}
+        saturation={0.5}
         fade={true}
         speed={0.5}
       />
 
       {/* Planets scattered throughout the universe */}
-      <Planet position={[20, 10, -30]} size={3} color="#ff6b47" rotationSpeed={0.005} />
-      <Planet position={[-40, -15, 50]} size={2.5} color="#4ecdc4" rotationSpeed={0.008} />
-      <Planet position={[60, 25, -80]} size={4} color="#45b7d1" rotationSpeed={0.003} />
-      <Planet position={[-80, 40, 20]} size={2} color="#f7dc6f" rotationSpeed={0.012} />
-      <Planet position={[100, -30, 60]} size={3.5} color="#bb8fce" rotationSpeed={0.006} />
-      <Planet position={[-60, 80, -40]} size={1.8} color="#82e0aa" rotationSpeed={0.015} />
-      <Planet position={[-100, 100, -100]} size={1.8} color="#e96ee1" rotationSpeed={0.015} />
-      <Planet position={[-50, 10, 100]} size={1.8} color="#8e1dd4" rotationSpeed={0.015} />
+      <Planet
+        position={[20, 10, -30]}
+        size={3}
+        color="#ff6b47"
+        rotationSpeed={0.005}
+      />
+      <Planet
+        position={[-40, -15, 50]}
+        size={2.5}
+        color="#4ecdc4"
+        rotationSpeed={0.008}
+      />
+      <Planet
+        position={[60, 25, -80]}
+        size={4}
+        color="#45b7d1"
+        rotationSpeed={0.003}
+      />
+      <Planet
+        position={[-80, 40, 20]}
+        size={2}
+        color="#f7dc6f"
+        rotationSpeed={0.012}
+      />
+      <Planet
+        position={[100, -30, 60]}
+        size={3.5}
+        color="#bb8fce"
+        rotationSpeed={0.006}
+      />
+      <Planet
+        position={[-60, 80, -40]}
+        size={1.8}
+        color="#82e0aa"
+        rotationSpeed={0.015}
+      />
+      <Planet
+        position={[-100, 100, -100]}
+        size={1.8}
+        color="#e96ee1"
+        rotationSpeed={0.015}
+      />
+      <Planet
+        position={[-50, 10, 100]}
+        size={1.8}
+        color="#8e1dd4"
+        rotationSpeed={0.015}
+      />
 
       {/* Nebula Clouds */}
       <NebulaCloud position={[0, 0, -100]} color="#ff00ff" />
@@ -339,7 +424,7 @@ function UniverseEnvironment({ logoSrc }: { logoSrc?: string }) {
       <Float speed={0.05} rotationIntensity={0.02} floatIntensity={0.1}>
         <mesh position={[0, 0, -200]}>
           <ringGeometry args={[15, 25, 64]} />
-          <meshStandardMaterial 
+          <meshStandardMaterial
             color="#ffffff"
             transparent
             opacity={0.3}
@@ -348,8 +433,6 @@ function UniverseEnvironment({ logoSrc }: { logoSrc?: string }) {
           />
         </mesh>
       </Float>
-
-      
 
       {/* Logo Overlay */}
       {logoSrc && (
@@ -360,11 +443,7 @@ function UniverseEnvironment({ logoSrc }: { logoSrc?: string }) {
           transform
           sprite
         >
-          <img 
-            src={logoSrc} 
-            alt="Logo" 
-            className="w-60 h-60 opacity-70"
-          />
+          <img src={logoSrc} alt="Logo" className="w-60 h-60 opacity-70" />
         </Html>
       )}
     </group>
@@ -374,23 +453,23 @@ function UniverseEnvironment({ logoSrc }: { logoSrc?: string }) {
 // Enhanced Camera Controller for space exploration
 function SpaceExplorationCamera() {
   const { camera } = useThree();
-  const [keys, setKeys] = useState<{[key: string]: boolean}>({});
+  const [keys, setKeys] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      setKeys(prev => ({ ...prev, [event.key.toLowerCase()]: true }));
+      setKeys((prev) => ({ ...prev, [event.key.toLowerCase()]: true }));
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {
-      setKeys(prev => ({ ...prev, [event.key.toLowerCase()]: false }));
+      setKeys((prev) => ({ ...prev, [event.key.toLowerCase()]: false }));
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
     };
   }, []);
 
@@ -398,26 +477,26 @@ function SpaceExplorationCamera() {
     const speed = 2;
     const direction = new THREE.Vector3();
     camera.getWorldDirection(direction);
-    
+
     const right = new THREE.Vector3();
     right.crossVectors(camera.up, direction).normalize();
-    
-    if (keys['w'] || keys['arrowup']) {
+
+    if (keys["w"] || keys["arrowup"]) {
       camera.position.add(direction.multiplyScalar(-speed));
     }
-    if (keys['s'] || keys['arrowdown']) {
+    if (keys["s"] || keys["arrowdown"]) {
       camera.position.add(direction.multiplyScalar(speed));
     }
-    if (keys['a'] || keys['arrowleft']) {
+    if (keys["a"] || keys["arrowleft"]) {
       camera.position.add(right.multiplyScalar(-speed));
     }
-    if (keys['d'] || keys['arrowright']) {
+    if (keys["d"] || keys["arrowright"]) {
       camera.position.add(right.multiplyScalar(speed));
     }
-    if (keys['q']) {
+    if (keys["q"]) {
       camera.position.y += speed;
     }
-    if (keys['e']) {
+    if (keys["e"]) {
       camera.position.y -= speed;
     }
   });
@@ -442,18 +521,23 @@ function SpaceExplorationCamera() {
 }
 
 // Main Universe Scene Component
-export function UniverseScene({ setCurrentView, logoSrc }: { setCurrentView: React.Dispatch<React.SetStateAction<'selector' | 'explorer'>>, logoSrc?: string }) {
-  const { 
-    selectedPath, 
-    isTrailMode, 
-    trailProgress, 
-    setIsTrailMode, 
-    setTrailProgress 
+export function UniverseScene({
+  setCurrentView,
+  logoSrc,
+}: {
+  setCurrentView: React.Dispatch<React.SetStateAction<"selector" | "explorer">>;
+  logoSrc?: string;
+}) {
+  const {
+    selectedPath,
+    isTrailMode,
+    trailProgress,
+    setIsTrailMode,
+    setTrailProgress,
   } = useCollectiblesStore();
   const { recentMints, isLoading: isLoadingRecent } = useRecentMintEvents();
   const { userNFTs, isLoadingUserNFTs } = useContractNFTs();
   const { username, displayName, pfpUrl, fid } = useProfile();
-
 
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<any>(null);
@@ -471,8 +555,16 @@ export function UniverseScene({ setCurrentView, logoSrc }: { setCurrentView: Rea
     chain?: string;
     timestamp?: number;
     castUrl?: string;
-    minter?: { username?: string; display_name?: string; pfp_url?: string } | null;
-    auther?: { username?: string; display_name?: string; pfp_url?: string } | null;
+    minter?: {
+      username?: string;
+      display_name?: string;
+      pfp_url?: string;
+    } | null;
+    author?: {
+      username?: string;
+      display_name?: string;
+      pfp_url?: string;
+    } | null;
   };
 
   // Map hooks to unified items
@@ -487,7 +579,7 @@ export function UniverseScene({ setCurrentView, logoSrc }: { setCurrentView: Rea
       timestamp: m.timestamp,
       castUrl: m.metadata?.external_url,
       minter: m.minterFarcasterUser || null,
-      auther: m.autherFarcasterUser || null,
+      author: m.authorFarcasterUser || null,
     }));
   }, [recentMints]);
 
@@ -501,12 +593,12 @@ export function UniverseScene({ setCurrentView, logoSrc }: { setCurrentView: Rea
       chain: n.chain,
       timestamp: n.mintTime ? Date.parse(n.mintTime) : undefined,
       castUrl: n.metadata?.external_url,
-      minter: { username, display_name: displayName, pfp_url:pfpUrl, fid },
-      auther: n.auther || null,
+      minter: n.minter || null,
+      author: n.author || null,
     }));
-  }, [userNFTs, username, displayName, pfpUrl, fid]);
+  }, [userNFTs]);
 
-  const currentItems = selectedPath === 'recent' ? recentItems : userItems;
+  const currentItems = selectedPath === "recent" ? recentItems : userItems;
   // Get positions for trail
   const collectiblePositions = useMemo(() => {
     return currentItems.map((_, index) => getCardPosition(index));
@@ -536,9 +628,7 @@ export function UniverseScene({ setCurrentView, logoSrc }: { setCurrentView: Rea
       if (lastTs === 0) lastTs = ts;
       const dt = (ts - lastTs) / 1000;
       lastTs = ts;
-      setTrailProgress(
-        Math.min(1, trailProgress + speedPerSec * dt)
-        );
+      setTrailProgress(Math.min(1, trailProgress + speedPerSec * dt));
       if (isTrailMode && isAutoTrail) rafId = requestAnimationFrame(step);
     };
     if (isTrailMode && isAutoTrail) rafId = requestAnimationFrame(step);
@@ -561,7 +651,8 @@ export function UniverseScene({ setCurrentView, logoSrc }: { setCurrentView: Rea
     const startProgress = trailProgress;
     const delta = targetProgress - startProgress;
 
-    const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
+    const easeInOut = (t: number) =>
+      t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 
     const step = (ts: number) => {
       const elapsed = ts - start;
@@ -589,7 +680,7 @@ export function UniverseScene({ setCurrentView, logoSrc }: { setCurrentView: Rea
 
   // Handle card click
   const handleCardClick = (id: string) => {
-    const item = currentItems.find(item => item.id === id);
+    const item = currentItems.find((item) => item.id === id);
     if (item) {
       setSelectedItem(item);
       setShowModal(true);
@@ -598,7 +689,7 @@ export function UniverseScene({ setCurrentView, logoSrc }: { setCurrentView: Rea
 
   // Handle see more click
   const handleSeeMoreClick = (id: string) => {
-    const item = currentItems.find(item => item.id === id);
+    const item = currentItems.find((item) => item.id === id);
     if (item) {
       setSelectedItem(item);
       setShowModal(true);
@@ -611,11 +702,7 @@ export function UniverseScene({ setCurrentView, logoSrc }: { setCurrentView: Rea
     const angle = index * 0.6;
     const height = Math.sin(index * 0.4) * 6; // reduced vertical spread
 
-    return [
-      Math.cos(angle) * radius,
-      height,
-      Math.sin(angle) * radius
-    ];
+    return [Math.cos(angle) * radius, height, Math.sin(angle) * radius];
   }
 
   return (
@@ -623,36 +710,39 @@ export function UniverseScene({ setCurrentView, logoSrc }: { setCurrentView: Rea
       <Canvas
         shadows
         camera={{ position: [0, 0, 50], fov: 75 }}
-        gl={{ 
-          antialias: true, 
+        gl={{
+          antialias: true,
           toneMapping: THREE.ACESFilmicToneMapping,
-          powerPreference: "high-performance"
+          powerPreference: "high-performance",
         }}
-        style={{ position: 'relative', zIndex: 1 }}
+        style={{ position: "relative", zIndex: 1 }}
       >
         {/* Lighting for space environment */}
         <ambientLight intensity={0.2} />
         <pointLight position={[0, 0, 0]} intensity={2} distance={100} />
-        <directionalLight 
-          position={[50, 50, 50]} 
-          intensity={0.5}
-          castShadow
-        />
+        <directionalLight position={[50, 50, 50]} intensity={0.5} castShadow />
 
         {/* Space Environment */}
-        <color attach="background" args={['#000008']} />
+        <color attach="background" args={["#000008"]} />
         <UniverseEnvironment logoSrc={logoSrc} />
-        
+
         {/* Floating Space Debris */}
         {Array.from({ length: 50 }, (_, i) => (
-          <Float key={i} speed={0.1 + Math.random() * 0.2} rotationIntensity={0.5} floatIntensity={0.3}>
-            <mesh position={[
-              (Math.random() - 0.5) * 200,
-              (Math.random() - 0.5) * 200,
-              (Math.random() - 0.5) * 200
-            ]}>
+          <Float
+            key={i}
+            speed={0.1 + Math.random() * 0.2}
+            rotationIntensity={0.5}
+            floatIntensity={0.3}
+          >
+            <mesh
+              position={[
+                (Math.random() - 0.5) * 200,
+                (Math.random() - 0.5) * 200,
+                (Math.random() - 0.5) * 200,
+              ]}
+            >
               <boxGeometry args={[0.1, 0.1, 0.1]} />
-              <meshStandardMaterial 
+              <meshStandardMaterial
                 color="#666666"
                 transparent
                 opacity={0.3}
@@ -662,7 +752,7 @@ export function UniverseScene({ setCurrentView, logoSrc }: { setCurrentView: Rea
             </mesh>
           </Float>
         ))}
-        
+
         {/* NFT Card Collectibles */}
         {currentItems.map((item, index) => (
           <NFTCard
@@ -675,7 +765,7 @@ export function UniverseScene({ setCurrentView, logoSrc }: { setCurrentView: Rea
         ))}
 
         {/* Trail Line */}
-        <TrailLine 
+        <TrailLine
           positions={collectiblePositions}
           isVisible={isTrailMode}
           progress={trailProgress}
@@ -683,7 +773,7 @@ export function UniverseScene({ setCurrentView, logoSrc }: { setCurrentView: Rea
 
         {/* Camera Controls */}
         {isTrailMode ? (
-          <TrailCameraController 
+          <TrailCameraController
             collectiblePositions={collectiblePositions}
             isTrailMode={isTrailMode}
           />
@@ -692,40 +782,18 @@ export function UniverseScene({ setCurrentView, logoSrc }: { setCurrentView: Rea
         )}
 
         {/* Space Fog for depth */}
-        <fog attach="fog" args={['#000020', 50, 300]} />
+        <fog attach="fog" args={["#000020", 50, 300]} />
       </Canvas>
 
-      {/* UI Controls */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black/70 text-white p-4 rounded-lg backdrop-blur-sm border border-cyan-400/50 z-10">
+      {/* UI Controls - Optimized for mobile */}
+      <div className="absolute bottom-8 md:bottom-6 left-1/2 transform -translate-x-1/2 bg-black/80 text-white p-5 md:p-4 rounded-xl backdrop-blur-sm border border-cyan-400/50 z-10 max-w-[90vw] md:max-w-none">
         <div className="text-center space-y-3">
-          <div className="flex items-center justify-center space-x-4">
-            <p className="text-sm text-cyan-300">
-              {isTrailMode ? '🚶‍♂️ Walking on Trail' : '🚀 Free Exploration'}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4">
+            <p className="text-base md:text-sm text-cyan-300 font-medium">
+              {isTrailMode ? "🚶 Walking on Trail" : "🚀 Free Exploration"}
             </p>
-            
-            {/* Trail Toggle Button */}
-            <button
-              onClick={handleTrailToggle}
-              className={`px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 ${
-                isTrailMode 
-                  ? 'bg-green-600/30 text-green-300 border border-green-400/50 hover:bg-green-600/50' 
-                  : 'bg-cyan-600/30 text-cyan-300 border border-cyan-400/50 hover:bg-cyan-600/50'
-              }`}
-            >
-              {isTrailMode ? 'Exit Trail' : 'Walk on Trail'}
-            </button>
           </div>
-          
-          {/* Trail Progress */}
-          {isTrailMode && (
-            <div className="text-xs text-green-300">
-              Trail Progress: {Math.round(trailProgress * 100)}% 
-              <span className="text-gray-400 ml-2">
-                ({Math.floor(trailProgress * currentItems.length) + 1}/{currentItems.length})
-              </span>
-            </div>
-          )}
-          
+
           <div className="grid-cols-2 gap-x-8 gap-y-1 text-xs hidden md:grid text-gray-300">
             {isTrailMode ? (
               <>
@@ -746,30 +814,39 @@ export function UniverseScene({ setCurrentView, logoSrc }: { setCurrentView: Rea
             )}
           </div>
           <div className="md:hidden grid grid-cols-1 gap-x-8 gap-y-1 text-xs text-gray-300">
-            {isLoadingRecent || isLoadingUserNFTs ? 'Loading...' : (
-              isTrailMode ? (
-                <div className="flex items-center justify-center space-x-3">
-                  <button
-                    className="px-3 py-1 rounded-lg bg-green-600/30 text-green-300 border border-green-400/50"
-                    onClick={() => goToIndex(currentWaypoint - 1)}
-                  >
-                    ◀ Back
-                  </button>
-                  
-                  <button
-                    className="px-3 py-1 rounded-lg bg-green-600/30 text-green-300 border border-green-400/50"
-                    onClick={() => goToIndex(currentWaypoint + 1)}
-                  >
-                    Next ▶
-                  </button>
-                </div>
-              ) : (
-                '🃏 Touch NFT cards to view collectibles'
-              )
+            {isLoadingRecent || isLoadingUserNFTs ? (
+              "Loading..."
+            ) : isTrailMode ? (
+              <div className="flex items-center justify-center space-x-3">
+                <button
+                  className="px-3 py-1 rounded-lg bg-green-600/30 text-green-300 border border-green-400/50"
+                  onClick={() => goToIndex(currentWaypoint - 1)}
+                >
+                  ◀ Back
+                </button>
+
+                <button
+                  className="px-3 py-1 rounded-lg bg-green-600/30 text-green-300 border border-green-400/50"
+                  onClick={() => goToIndex(currentWaypoint + 1)}
+                >
+                  Next ▶
+                </button>
+              </div>
+            ) : (
+              "🃏 Touch NFT cards to view collectibles"
             )}
           </div>
-          <p className="text-xs text-cyan-400">
-            {currentItems.length} NFT cards discovered in {selectedPath === 'recent' ? 'recent space' : 'your fleet'}
+
+          {/* Trail Toggle Button - Larger for mobile */}
+          <button
+            onClick={handleTrailToggle}
+            className={`px-2 py-1 rounded-lg text-sm md:text-xs font-medium transition-all duration-200 md:min-h-0 border border-gray-500`}
+          >
+            {isTrailMode ? "Exit Trail" : "Walk on Trail"}
+          </button>
+
+          <p className="text-sm md:text-xs text-cyan-400 font-medium">
+            {currentItems.length} collectibles discovered
           </p>
         </div>
       </div>
@@ -777,22 +854,17 @@ export function UniverseScene({ setCurrentView, logoSrc }: { setCurrentView: Rea
       {/* Collection Info */}
       <div className="absolute hidden md:block top-16 left-6 bg-black/70 text-white p-4 rounded-lg backdrop-blur-sm border border-cyan-400/50 z-10">
         <h2 className="text-lg font-bold text-cyan-300 mb-2">
-          {selectedPath === 'recent' ? '🌌 Recent Discoveries' : '🚁 Your Fleet'}
+          {selectedPath === "recent"
+            ? "🌌 Recent Discoveries"
+            : "🚁 Your Fleet"}
         </h2>
         <p className="text-sm text-gray-300">
           Exploring collectibles in the vast universe
         </p>
         <div className="text-xs text-cyan-400 mt-2">
-          {hoveredCard ? `Scanning: ${hoveredCard}` : 'Navigate to discover'}
+          {hoveredCard ? `Scanning: ${hoveredCard}` : "Navigate to discover"}
         </div>
       </div>
-      {/* Back to path selector button */}
-          <button
-            onClick={() => setCurrentView('selector')}
-            className="absolute top-16 right-6 bg-gray-800 bg-opacity-80 text-white px-4 py-2 rounded-lg hover:bg-opacity-100 transition-all z-10"
-          >
-            ← <span className="text-xs hidden md:inline">Change Path</span>
-          </button>
 
       {/* Collectible Modal */}
       <CollectibleModal

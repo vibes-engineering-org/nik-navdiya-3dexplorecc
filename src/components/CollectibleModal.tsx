@@ -46,33 +46,35 @@ export function CollectibleModal({ item, isOpen, onClose }: CollectibleModalProp
 
         {/* Content */}
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-          {/* Minter Info */}
-          <div className="flex items-center space-x-4 mb-6">
-            {item.minter?.pfp_url ? (
-              <img 
-                src={item.minter.pfp_url} 
-                alt={item.minter?.display_name || item.minter?.username || 'Minter'} 
-                className="w-16 h-16 rounded-full border-2 border-blue-400 shadow-lg"
-              />
-            ) : (
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-2 border-blue-400 flex items-center justify-center">
-                <span className="text-blue-300 text-xl font-bold">
-                  {item.minter?.username?.[0]?.toUpperCase() || '?'}
-                </span>
+          {/* Author Info - Only show if we have actual author data */}
+          {item.author && (item.author.username || item.author.display_name) && (
+            <div className="flex items-center space-x-4 mb-6">
+              {item.author?.pfp_url ? (
+                <img 
+                  src={item.author.pfp_url} 
+                  alt={item.author?.display_name || item.author?.username || 'Author'} 
+                  className="w-16 h-16 rounded-full border-2 border-blue-400 shadow-lg"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-2 border-blue-400 flex items-center justify-center">
+                  <span className="text-blue-300 text-xl font-bold">
+                    {item.author?.username?.[0]?.toUpperCase() || '?'}
+                  </span>
+                </div>
+              )}
+              <div>
+                <h3 className="text-lg font-semibold text-blue-300">
+                  {item.author?.display_name || item.author?.username}
+                </h3>
+                {item.author?.username && (
+                  <p className="text-blue-400">@{item.author.username}</p>
+                )}
+                {item.author?.fid && (
+                  <p className="text-gray-400 text-sm">FID: {item.author.fid}</p>
+                )}
               </div>
-            )}
-            <div>
-              <h3 className="text-lg font-semibold text-blue-300">
-                {item.minter?.display_name || 'Unknown Minter'}
-              </h3>
-              {item.minter?.username && (
-                <p className="text-blue-400">@{item.minter.username}</p>
-              )}
-              {item.minter?.fid && (
-                <p className="text-gray-400 text-sm">FID: {item.minter.fid}</p>
-              )}
             </div>
-          </div>
+          )}
 
           {/* NFT Image */}
           {item.image && (
@@ -120,12 +122,20 @@ export function CollectibleModal({ item, isOpen, onClose }: CollectibleModalProp
           {/* Technical Details */}
           <div className="grid grid-cols-2 gap-4 p-4 bg-blue-900/20 rounded-xl border border-blue-400/20">
             <div>
-              <h5 className="text-blue-300 text-sm font-medium">Auther</h5>
-                <p className="text-white capitalize" onClick={() => window.open(`https://www.farcaster.xyz/${item.auther?.username}`, '_blank')}>@{item.auther?.username || 'Unknown Auther'}</p>
+              <h5 className="text-blue-300 text-sm font-medium">Author</h5>
+                {item.author?.username ? (
+                  <p className="text-white capitalize cursor-pointer hover:text-blue-300" onClick={() => window.open(`https://www.farcaster.xyz/${item.author.username}`, '_blank')}>@{item.author.username}</p>
+                ) : (
+                  <p className="text-gray-400">Unknown Author</p>
+                )}
             </div>
             <div>
               <h5 className="text-blue-300 text-sm font-medium">Minter</h5>
-              <p className="text-white capitalize" onClick={() => window.open(`https://www.farcaster.xyz/${item.minter?.username}`, '_blank')}>@{item.minter?.username || 'Unknown Minter'}</p>
+              {item.minter?.username ? (
+                <p className="text-white capitalize cursor-pointer hover:text-blue-300" onClick={() => window.open(`https://www.farcaster.xyz/${item.minter.username}`, '_blank')}>@{item.minter.username}</p>
+              ) : (
+                <p className="text-gray-400">Unknown Minter</p>
+              )}
             </div>
             <div className="col-span-2">
               <h5 className="text-blue-300 text-sm font-medium">Token ID</h5>

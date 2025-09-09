@@ -78,7 +78,7 @@ export function CollectiblesProvider({ children }: { children: ReactNode }) {
   const [showHologram, setShowHologram] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [hasReachedEnd, setHasReachedEnd] = useState(false);
-  const [isTrailMode, setIsTrailMode] = useState(false);
+  const [isTrailMode, setIsTrailMode] = useState(true);
   const [trailProgress, setTrailProgress] = useState(0);
 
 
